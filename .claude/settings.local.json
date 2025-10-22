@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm install:*)",
+      "Bash(npm install)",
+<<<<<<< HEAD
+      "Bash(npm run test-recommendations:*)",
+      "Bash(npm run dev:*)",
+      "Bash(rm:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(npm run ingest-vector-movies:*)",
+      "Bash(npx tsx:*)"
+    ],
+    "deny": [],
+    "ask": []
+=======
+      "Bash(mv:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm audit:*)",
+      "Bash(npm install:*)",
+      "Bash(curl:*)",
+      "Bash(git add:*)",
+      "Bash(git pull:*)"
+    ],
+    "deny": []
+>>>>>>> cc79e1ede6332803b1f23a532f640a94fbc3a79a
+  }
+}
