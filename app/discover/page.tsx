@@ -41,6 +41,7 @@ export default function MovieRecommender() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [activeTab, setActiveTab] = useState<"popular" | "top-rated" | "search" | "discover" | "indian" | "bollywood" | "hindi">("popular")
+  const [hasMore, setHasMore] = useState(true)
   const [selectedCountryFilter, setSelectedCountryFilter] = useState<"all" | "indian" | "bollywood" | "hindi">("all")
   const [featuredMovie, setFeaturedMovie] = useState<TMDBMovie | null>(null)
   const [showFilters, setShowFilters] = useState(false)
@@ -189,16 +190,17 @@ export default function MovieRecommender() {
     }
   }
 
-  // Memoized movie functions to prevent recreation on every render  
-  const loadPopularMovies = useCallback(async (page = 1) => {
+  // Memoized movie functions to prevent recreation on every render
+  const loadPopularMovies = useCallback(async (page = 1, append = false) => {
     setIsLoading(true)
     try {
       const data = await getPopularMovies(page)
-      setMovies(data.results)
+      setMovies(prev => append ? [...prev, ...data.results] : data.results)
       setTotalPages(data.total_pages)
       setCurrentPage(page)
+      setHasMore(page < data.total_pages)
       setActiveTab("popular")
-      if (page === 1) setFeaturedMovie(data.results[0])
+      if (page === 1 && !append) setFeaturedMovie(data.results[0])
     } catch (error) {
       console.error("Error loading popular movies:", error)
     } finally {
@@ -206,15 +208,16 @@ export default function MovieRecommender() {
     }
   }, [])
 
-  const loadTopRatedMovies = useCallback(async (page = 1) => {
+  const loadTopRatedMovies = useCallback(async (page = 1, append = false) => {
     setIsLoading(true)
     try {
       const data = await getTopRatedMovies(page)
-      setMovies(data.results)
+      setMovies(prev => append ? [...prev, ...data.results] : data.results)
       setTotalPages(data.total_pages)
       setCurrentPage(page)
+      setHasMore(page < data.total_pages)
       setActiveTab("top-rated")
-      if (page === 1) setFeaturedMovie(data.results[0])
+      if (page === 1 && !append) setFeaturedMovie(data.results[0])
     } catch (error) {
       console.error("Error loading top rated movies:", error)
     } finally {
@@ -222,15 +225,16 @@ export default function MovieRecommender() {
     }
   }, [])
 
-  const loadIndianMovies = async (page = 1) => {
+  const loadIndianMovies = async (page = 1, append = false) => {
     setIsLoading(true)
     try {
       const data = await getIndianMovies(page)
-      setMovies(data.results)
+      setMovies(prev => append ? [...prev, ...data.results] : data.results)
       setTotalPages(data.total_pages)
       setCurrentPage(page)
+      setHasMore(page < data.total_pages)
       setActiveTab("indian")
-      if (page === 1) setFeaturedMovie(data.results[0])
+      if (page === 1 && !append) setFeaturedMovie(data.results[0])
     } catch (error) {
       console.error("Error loading Indian movies:", error)
     } finally {
@@ -238,15 +242,16 @@ export default function MovieRecommender() {
     }
   }
 
-  const loadBollywoodMovies = async (page = 1) => {
+  const loadBollywoodMovies = async (page = 1, append = false) => {
     setIsLoading(true)
     try {
       const data = await getBollywoodMovies(page)
-      setMovies(data.results)
+      setMovies(prev => append ? [...prev, ...data.results] : data.results)
       setTotalPages(data.total_pages)
       setCurrentPage(page)
+      setHasMore(page < data.total_pages)
       setActiveTab("bollywood")
-      if (page === 1) setFeaturedMovie(data.results[0])
+      if (page === 1 && !append) setFeaturedMovie(data.results[0])
     } catch (error) {
       console.error("Error loading Bollywood movies:", error)
     } finally {
@@ -254,15 +259,16 @@ export default function MovieRecommender() {
     }
   }
 
-  const loadHindiMovies = async (page = 1) => {
+  const loadHindiMovies = async (page = 1, append = false) => {
     setIsLoading(true)
     try {
       const data = await getHindiMovies(page)
-      setMovies(data.results)
+      setMovies(prev => append ? [...prev, ...data.results] : data.results)
       setTotalPages(data.total_pages)
       setCurrentPage(page)
+      setHasMore(page < data.total_pages)
       setActiveTab("hindi")
-      if (page === 1) setFeaturedMovie(data.results[0])
+      if (page === 1 && !append) setFeaturedMovie(data.results[0])
     } catch (error) {
       console.error("Error loading Hindi movies:", error)
     } finally {
@@ -270,17 +276,18 @@ export default function MovieRecommender() {
     }
   }
 
-  const handleSearch = useCallback(async (page = 1) => {
+  const handleSearch = useCallback(async (page = 1, append = false) => {
     if (!searchQuery.trim()) return
 
     setIsLoading(true)
     try {
       const data = await searchMovies(searchQuery, page)
-      setMovies(data.results)
+      setMovies(prev => append ? [...prev, ...data.results] : data.results)
       setTotalPages(data.total_pages)
       setCurrentPage(page)
+      setHasMore(page < data.total_pages)
       setActiveTab("search")
-      if (page === 1 && data.results.length > 0) setFeaturedMovie(data.results[0])
+      if (page === 1 && !append && data.results.length > 0) setFeaturedMovie(data.results[0])
     } catch (error) {
       console.error("Error searching movies:", error)
     } finally {
@@ -288,7 +295,7 @@ export default function MovieRecommender() {
     }
   }, [searchQuery])
 
-  const handleDiscover = useCallback(async (page = 1) => {
+  const handleDiscover = useCallback(async (page = 1, append = false) => {
     setIsLoading(true)
     try {
       const params: any = {
@@ -297,7 +304,7 @@ export default function MovieRecommender() {
         sortBy,
         page,
       }
-      
+
       if (selectedCountryFilter === "indian") {
         params.country = "IN"
       } else if (selectedCountryFilter === "bollywood") {
@@ -308,11 +315,12 @@ export default function MovieRecommender() {
       }
 
       const data = await discoverMovies(params)
-      setMovies(data.results)
+      setMovies(prev => append ? [...prev, ...data.results] : data.results)
       setTotalPages(data.total_pages)
       setCurrentPage(page)
+      setHasMore(page < data.total_pages)
       setActiveTab("discover")
-      if (page === 1 && data.results.length > 0) setFeaturedMovie(data.results[0])
+      if (page === 1 && !append && data.results.length > 0) setFeaturedMovie(data.results[0])
     } catch (error) {
       console.error("Error discovering movies:", error)
     } finally {
@@ -340,6 +348,7 @@ export default function MovieRecommender() {
   }
 
   const handlePageChange = (page: number) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
     switch (activeTab) {
       case "popular":
         loadPopularMovies(page)
@@ -361,6 +370,33 @@ export default function MovieRecommender() {
         break
       case "hindi":
         loadHindiMovies(page)
+        break
+    }
+  }
+
+  const loadMoreMovies = () => {
+    const nextPage = currentPage + 1
+    switch (activeTab) {
+      case "popular":
+        loadPopularMovies(nextPage, true)
+        break
+      case "top-rated":
+        loadTopRatedMovies(nextPage, true)
+        break
+      case "search":
+        handleSearch(nextPage, true)
+        break
+      case "discover":
+        handleDiscover(nextPage, true)
+        break
+      case "indian":
+        loadIndianMovies(nextPage, true)
+        break
+      case "bollywood":
+        loadBollywoodMovies(nextPage, true)
+        break
+      case "hindi":
+        loadHindiMovies(nextPage, true)
         break
     }
   }
@@ -867,11 +903,32 @@ export default function MovieRecommender() {
           onLoadMovies={loadPopularMovies}
         />
 
-        {/* Pagination */}
+        {/* Load More Button */}
+        {movies.length > 0 && hasMore && (
+          <div className="flex justify-center items-center gap-4 mt-8">
+            <Button
+              onClick={loadMoreMovies}
+              disabled={isLoading}
+              className="bg-yellow-500 text-black hover:bg-yellow-600 px-8 py-6 text-lg font-semibold"
+            >
+              {isLoading ? "Loading..." : "Load More Movies"}
+            </Button>
+          </div>
+        )}
+
+        {/* Show total count */}
+        {movies.length > 0 && (
+          <div className="text-center text-gray-400 mt-4">
+            Showing {movies.length} movies {totalPages > 1 && `(Page ${currentPage} of ${totalPages})`}
+          </div>
+        )}
+
+        {/* Traditional Pagination - Still available for manual page jumping */}
         {movies.length > 0 && totalPages > 1 && (
-          <div className="flex justify-center items-center gap-4">
+          <div className="flex justify-center items-center gap-4 mt-6 pt-6 border-t border-gray-800">
             <Button
               variant="outline"
+              size="sm"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
               className="border-gray-700 text-white hover:bg-gray-800"
@@ -880,14 +937,15 @@ export default function MovieRecommender() {
               Previous
             </Button>
 
-            <span className="text-gray-400">
-              Page {currentPage} of {totalPages}
+            <span className="text-gray-400 text-sm">
+              Jump to page {currentPage}
             </span>
 
             <Button
               variant="outline"
+              size="sm"
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              disabled={currentPage >= totalPages}
               className="border-gray-700 text-white hover:bg-gray-800"
             >
               Next
