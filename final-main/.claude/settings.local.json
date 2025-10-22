@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat \"C:\\Users\\Asus\\Desktop\\goresee\\final-main\\final-main\\.env\")",
+      "Bash(node --version)",
+      "Bash(npm --version)",
+      "Bash(npm install)",
+      "Bash(npm run dev)",
+      "Bash(rm -rf .next)",
+      "Bash(curl -s \"http://localhost:3007/api/tmdb?path=%2F3%2Fgenre%2Fmovie%2Flist\")",
+      "Bash(curl -s \"http://localhost:3007/api/tmdb?path=%2F3%2Fmovie%2Fpopular&page=1\")",
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(tree:*)",
+      "Bash(dir:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
