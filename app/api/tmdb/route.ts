@@ -3,8 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 export const runtime = 'edge';
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org';
-const TMDB_READ_TOKEN = process.env.TMDB_READ_TOKEN ||
-  process.env.TMDB_ACCESS_TOKEN ||
+const TMDB_READ_TOKEN = process.env.TMDB_ACCESS_TOKEN ||
+  process.env.TMDB_READ_TOKEN ||
+  process.env.NEXT_PUBLIC_TMDB_ACCESS_TOKEN ||
   "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyNGRiZWYzOTRmOTAzNGMwM2ViNmM5M2E4ZjA0M2MwNSIsIm5iZiI6MTc1MjkzMTUwOS44MzMsInN1YiI6IjY4N2I5Y2I1ZGZmMDA4MWRhYzcyYzI1YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.RmEVeq7ssiU0LSkUj9ihGMySUeS3y3CbeKs_00BCsi4";
 
 // Timeout wrapper for fetch with AbortController
@@ -167,6 +168,24 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Log environment check (helpful for debugging Vercel deployment)
+    const hasToken = !!TMDB_READ_TOKEN && TMDB_READ_TOKEN.length > 50;
+    console.log('[TMDB Proxy] Token available:', hasToken);
+    console.log('[TMDB Proxy] Requesting path:', path);
+
+    if (!hasToken) {
+      console.error('[TMDB Proxy] ERROR: No valid TMDB_ACCESS_TOKEN found in environment variables!');
+      const mockData = getMockData(path);
+      return NextResponse.json(mockData, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Fallback-Data': 'true',
+          'X-Error': 'TMDB_ACCESS_TOKEN not configured in Vercel environment variables'
+        }
+      });
+    }
+
     // Remove path from search params to forward remaining params
     searchParams.delete('path');
     const queryString = searchParams.toString();
@@ -185,6 +204,7 @@ export async function GET(request: NextRequest) {
       });
 
       const data = await response.json();
+      console.log('[TMDB Proxy] Success - Direct TMDB API');
 
       return NextResponse.json(data, {
         status: response.status,
@@ -193,12 +213,13 @@ export async function GET(request: NextRequest) {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
-          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400'
+          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+          'X-Data-Source': 'tmdb-direct'
         }
       });
     } catch (fetchError) {
       // If direct TMDB fetch fails (likely blocked in India), try CORS proxy
-      console.warn('[TMDB Proxy] Direct TMDB failed, trying CORS proxy:', fetchError);
+      console.warn('[TMDB Proxy] Direct TMDB failed, trying CORS proxy:', fetchError instanceof Error ? fetchError.message : fetchError);
 
       try {
         // Use cors.eu.org proxy (free, no rate limits, works in India)
@@ -219,6 +240,7 @@ export async function GET(request: NextRequest) {
         }
 
         const proxyData = await proxyResponse.json();
+        console.log('[TMDB Proxy] Success - CORS proxy');
 
         return NextResponse.json(proxyData, {
           status: 200,
@@ -228,14 +250,16 @@ export async function GET(request: NextRequest) {
             'Access-Control-Allow-Methods': 'GET, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type',
             'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600',
-            'X-Proxy-Used': 'cors-eu'
+            'X-Data-Source': 'cors-proxy'
           }
         });
       } catch (proxyError) {
-        console.error('[TMDB Proxy] CORS proxy also failed:', proxyError);
+        console.error('[TMDB Proxy] CORS proxy also failed:', proxyError instanceof Error ? proxyError.message : proxyError);
 
         // Last resort: return mock data with clear indication
         const mockData = getMockData(path);
+        console.warn('[TMDB Proxy] Falling back to mock data');
+
         return NextResponse.json(mockData, {
           status: 200,
           headers: {
@@ -244,8 +268,8 @@ export async function GET(request: NextRequest) {
             'Access-Control-Allow-Methods': 'GET, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type',
             'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=600',
-            'X-Fallback-Data': 'true',
-            'X-Error': 'TMDB API unreachable in your region'
+            'X-Data-Source': 'mock-data',
+            'X-Error': 'TMDB API unreachable - check Vercel logs'
           }
         });
       }
