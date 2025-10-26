@@ -4,9 +4,9 @@
  */
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org';
-const TMDB_READ_TOKEN = process.env.TMDB_READ_TOKEN || 
-  process.env.TMDB_ACCESS_TOKEN || 
-  "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyNGRiZWYzOTRmOTAzNGMwM2ViNmM5M2E4ZjA0M2MwNSIsIm5iZiI6MTc1MjkzMTUwOS44MzMsInN1YiI6IjY4N2I5Y2I1ZGZmMDA4MWRhYzcyYzI1YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.RmEVeq7ssiU0LSkUj9ihGMySUeS3y3CbeKs_00BCsi4";
+const TMDB_READ_TOKEN = process.env.TMDB_READ_TOKEN ||
+  process.env.TMDB_ACCESS_TOKEN ||
+  "";
 
 async function retryFetch(url: string, options: RequestInit, maxRetries = 2): Promise<Response> {
   let lastError: Error = new Error('Unknown error');

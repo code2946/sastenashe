@@ -375,10 +375,10 @@ export const getMovieCredits = async (movieId: number) => {
 export const getMovieVideos = async (movieId: number) => {
   try {
     const response = await fetchFromTMDB(`/3/movie/${movieId}/videos`)
-    return response
+    return response.results || []
   } catch (error) {
     console.warn(`Failed to fetch videos for movie ${movieId}:`, error)
-    return { results: [] }
+    return []
   }
 }
 
@@ -405,10 +405,17 @@ export const getSimilarMovies = async (movieId: number, page: number = 1): Promi
 export const getMovieWatchProviders = async (movieId: number) => {
   try {
     const response = await fetchFromTMDB(`/3/movie/${movieId}/watch/providers`)
-    return response
+    // TMDB returns { results: { US: { flatrate: [...], rent: [...], buy: [...] } } }
+    // We extract the US region data (you can make this dynamic based on user location)
+    const usProviders = response.results?.US || {}
+    return {
+      flatrate: usProviders.flatrate || [],
+      rent: usProviders.rent || [],
+      buy: usProviders.buy || []
+    }
   } catch (error) {
     console.warn(`Failed to fetch watch providers for movie ${movieId}:`, error)
-    return { results: {} }
+    return { flatrate: [], rent: [], buy: [] }
   }
 }
 
@@ -423,6 +430,306 @@ export const getMovieRecommendations = async (movieId: number, page: number = 1)
     }
   } catch (error) {
     console.warn(`Failed to fetch recommendations for movie ${movieId}:`, error)
+    return {
+      results: [],
+      total_pages: 1,
+      page: 1,
+      total_results: 0
+    }
+  }
+}
+
+// ==================== TV SERIES FUNCTIONS ====================
+
+export interface TMDBSeries {
+  id: number
+  name: string
+  overview: string
+  first_air_date: string
+  vote_average: number
+  poster_path: string | null
+  backdrop_path: string | null
+  genre_ids?: number[]
+  genre_names?: string[]
+  popularity?: number
+  original_language?: string
+}
+
+export interface TMDBSeriesDetails extends TMDBSeries {
+  number_of_seasons: number
+  number_of_episodes: number
+  genres: { id: number; name: string }[]
+  seasons: Array<{
+    id: number
+    name: string
+    overview: string
+    season_number: number
+    episode_count: number
+    poster_path: string | null
+  }>
+  created_by: Array<{ name: string }>
+  networks: Array<{ name: string; logo_path: string | null }>
+}
+
+export interface SeriesResponse {
+  results: TMDBSeries[]
+  total_pages: number
+  page?: number
+  total_results?: number
+}
+
+// Get popular TV series
+export const getPopularSeries = async (page: number = 1): Promise<SeriesResponse> => {
+  try {
+    const response = await fetchFromTMDB('/3/tv/popular', { page: page.toString() })
+    return {
+      results: response.results || [],
+      total_pages: response.total_pages || 1,
+      page: response.page || 1,
+      total_results: response.total_results || 0
+    }
+  } catch (error) {
+    console.warn('Failed to fetch popular series:', error)
+    return {
+      results: [],
+      total_pages: 1,
+      page: 1,
+      total_results: 0
+    }
+  }
+}
+
+// Get top rated TV series
+export const getTopRatedSeries = async (page: number = 1): Promise<SeriesResponse> => {
+  try {
+    const response = await fetchFromTMDB('/3/tv/top_rated', { page: page.toString() })
+    return {
+      results: response.results || [],
+      total_pages: response.total_pages || 1,
+      page: response.page || 1,
+      total_results: response.total_results || 0
+    }
+  } catch (error) {
+    console.warn('Failed to fetch top rated series:', error)
+    return {
+      results: [],
+      total_pages: 1,
+      page: 1,
+      total_results: 0
+    }
+  }
+}
+
+// Search TV series
+export const searchSeries = async (query: string, page: number = 1): Promise<SeriesResponse> => {
+  try {
+    const response = await fetchFromTMDB('/3/search/tv', {
+      query: encodeURIComponent(query),
+      page: page.toString()
+    })
+    return {
+      results: response.results || [],
+      total_pages: response.total_pages || 1,
+      page: response.page || 1,
+      total_results: response.total_results || 0
+    }
+  } catch (error) {
+    console.warn('Failed to search series:', error)
+    return {
+      results: [],
+      total_pages: 1,
+      page: 1,
+      total_results: 0
+    }
+  }
+}
+
+// Get TV series details
+export const getSeriesDetails = async (seriesId: number): Promise<TMDBSeriesDetails> => {
+  try {
+    const response = await fetchFromTMDB(`/3/tv/${seriesId}`, {
+      append_to_response: 'credits'
+    })
+
+    return {
+      ...response,
+      number_of_seasons: response.number_of_seasons || 0,
+      number_of_episodes: response.number_of_episodes || 0,
+      genres: response.genres || [],
+      seasons: response.seasons || [],
+      created_by: response.created_by || [],
+      networks: response.networks || []
+    }
+  } catch (error) {
+    console.warn(`Failed to fetch series details for ${seriesId}:`, error)
+    return {
+      id: seriesId,
+      name: "Unknown Series",
+      overview: "Series details unavailable",
+      first_air_date: "2024-01-01",
+      vote_average: 0,
+      poster_path: null,
+      backdrop_path: null,
+      number_of_seasons: 0,
+      number_of_episodes: 0,
+      genres: [],
+      seasons: [],
+      created_by: [],
+      networks: []
+    }
+  }
+}
+
+// Get TV series credits
+export const getSeriesCredits = async (seriesId: number) => {
+  try {
+    const response = await fetchFromTMDB(`/3/tv/${seriesId}/credits`)
+    return response
+  } catch (error) {
+    console.warn(`Failed to fetch credits for series ${seriesId}:`, error)
+    return { cast: [], crew: [] }
+  }
+}
+
+// Get TV series videos
+export const getSeriesVideos = async (seriesId: number) => {
+  try {
+    const response = await fetchFromTMDB(`/3/tv/${seriesId}/videos`)
+    return response.results || []
+  } catch (error) {
+    console.warn(`Failed to fetch videos for series ${seriesId}:`, error)
+    return []
+  }
+}
+
+// Get similar TV series
+export const getSimilarSeries = async (seriesId: number, page: number = 1): Promise<SeriesResponse> => {
+  try {
+    const response = await fetchFromTMDB(`/3/tv/${seriesId}/similar`, { page: page.toString() })
+    return {
+      results: response.results || [],
+      total_pages: response.total_pages || 1,
+      page: response.page || 1,
+      total_results: response.total_results || 0
+    }
+  } catch (error) {
+    console.warn(`Failed to fetch similar series for ${seriesId}:`, error)
+    return {
+      results: [],
+      total_pages: 1,
+      page: 1,
+      total_results: 0
+    }
+  }
+}
+
+// Get TV series watch providers
+export const getSeriesWatchProviders = async (seriesId: number) => {
+  try {
+    const response = await fetchFromTMDB(`/3/tv/${seriesId}/watch/providers`)
+    const usProviders = response.results?.US || {}
+    return {
+      flatrate: usProviders.flatrate || [],
+      rent: usProviders.rent || [],
+      buy: usProviders.buy || []
+    }
+  } catch (error) {
+    console.warn(`Failed to fetch watch providers for series ${seriesId}:`, error)
+    return { flatrate: [], rent: [], buy: [] }
+  }
+}
+
+// Discover TV series with filters
+export const discoverSeries = async (params: {
+  genres?: number[]
+  minRating?: number
+  year?: number
+  sortBy?: string
+  page?: number
+  country?: string
+  originalLanguage?: string
+}): Promise<SeriesResponse> => {
+  try {
+    const queryParams: Record<string, string> = {
+      page: (params.page || 1).toString(),
+      sort_by: params.sortBy || 'popularity.desc'
+    }
+
+    if (params.genres && params.genres.length > 0) {
+      queryParams.with_genres = params.genres.join(',')
+    }
+    if (params.minRating) {
+      queryParams['vote_average.gte'] = params.minRating.toString()
+    }
+    if (params.year) {
+      queryParams.first_air_date_year = params.year.toString()
+    }
+    if (params.country) {
+      queryParams.with_origin_country = params.country
+    }
+    if (params.originalLanguage) {
+      queryParams.with_original_language = params.originalLanguage
+    }
+
+    const response = await fetchFromTMDB('/3/discover/tv', queryParams)
+    return {
+      results: response.results || [],
+      total_pages: response.total_pages || 1,
+      page: response.page || 1,
+      total_results: response.total_results || 0
+    }
+  } catch (error) {
+    console.warn('Failed to discover series:', error)
+    return {
+      results: [],
+      total_pages: 1,
+      page: 1,
+      total_results: 0
+    }
+  }
+}
+
+// Get Indian TV series
+export const getIndianSeries = async (page: number = 1): Promise<SeriesResponse> => {
+  try {
+    const response = await fetchFromTMDB('/3/discover/tv', {
+      page: page.toString(),
+      with_origin_country: 'IN',
+      sort_by: 'popularity.desc'
+    })
+    return {
+      results: response.results || [],
+      total_pages: response.total_pages || 1,
+      page: response.page || 1,
+      total_results: response.total_results || 0
+    }
+  } catch (error) {
+    console.warn('Failed to fetch Indian series:', error)
+    return {
+      results: [],
+      total_pages: 1,
+      page: 1,
+      total_results: 0
+    }
+  }
+}
+
+// Get Hindi TV series
+export const getHindiSeries = async (page: number = 1): Promise<SeriesResponse> => {
+  try {
+    const response = await fetchFromTMDB('/3/discover/tv', {
+      page: page.toString(),
+      with_original_language: 'hi',
+      sort_by: 'popularity.desc'
+    })
+    return {
+      results: response.results || [],
+      total_pages: response.total_pages || 1,
+      page: response.page || 1,
+      total_results: response.total_results || 0
+    }
+  } catch (error) {
+    console.warn('Failed to fetch Hindi series:', error)
     return {
       results: [],
       total_pages: 1,

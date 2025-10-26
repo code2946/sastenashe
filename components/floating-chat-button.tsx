@@ -200,58 +200,46 @@ export function FloatingChatButton() {
       <SheetTrigger asChild>
         <Button
           size="icon"
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 h-14 w-14 sm:h-16 sm:w-16 rounded-3xl shadow-2xl bg-[#EAB308] hover:bg-[#D97706] text-white z-50 transition-all duration-300 hover:scale-105 border border-yellow-400/30 backdrop-blur-sm group"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 h-14 w-14 sm:h-16 sm:w-16 rounded-2xl shadow-xl bg-gradient-to-br from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700 text-white z-50 transition-all duration-200 active:scale-95 border-0"
         >
           <div className="relative flex items-center justify-center">
-            {/* Premium AI text */}
-            <span className="text-base sm:text-lg font-black text-white tracking-wider transform transition-all duration-200 group-hover:scale-110">AI</span>
-
-            {/* Simple glow effect */}
-            <div className="absolute inset-0 rounded-3xl bg-yellow-400/20 blur-sm group-hover:blur-md transition-all duration-200" />
+            <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white" strokeWidth={2.5} />
           </div>
         </Button>
       </SheetTrigger>
 
-      <SheetContent side="bottom" className="h-[85vh] sm:h-[90vh] flex flex-col gap-0 bg-gradient-to-br from-slate-950 via-gray-900 to-slate-950 text-white border-slate-700/50 p-0 backdrop-blur-xl animate-in slide-in-from-bottom-2 fade-in-0 duration-200">
+      <SheetContent side="bottom" className="h-[90vh] sm:h-[85vh] flex flex-col gap-0 bg-slate-950 text-white border-slate-800 p-0 animate-in slide-in-from-bottom-2 fade-in-0 duration-200">
         {/* Header */}
-        <SheetHeader className="relative p-6 pb-5 border-b border-gradient-to-r from-purple-500/20 via-blue-500/20 to-cyan-500/20 bg-gradient-to-r from-slate-900/80 via-gray-900/80 to-slate-900/80 backdrop-blur-sm">
-          {/* Background pattern */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),transparent_50%)]" />
-          
+        <SheetHeader className="relative p-3 sm:p-4 border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-lg">
           <div className="relative flex items-center justify-between">
-            <SheetTitle className="text-2xl font-bold text-white flex items-center gap-4">
-              {/* Simple Chat Avatar */}
+            <SheetTitle className="text-base sm:text-lg font-semibold text-white flex items-center gap-2.5 sm:gap-3">
+              {/* Clean Avatar */}
               <div className="relative">
-                <div className="w-12 h-12 bg-[#EAB308] rounded-2xl flex items-center justify-center shadow-xl border border-yellow-400/30">
-                  <MessageCircle className="w-7 h-7 text-white" />
+                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <MessageCircle className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-white" strokeWidth={2.5} />
                 </div>
-                {/* Simple animated glow */}
-                <div className="absolute inset-0 rounded-2xl bg-yellow-400/20 blur-md animate-pulse" />
                 {/* Status indicator */}
-                <div className="absolute -bottom-1 -right-1">
-                  <div className="w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900 shadow-lg">
-                    <div className="w-full h-full bg-green-400 rounded-full animate-ping opacity-75" />
-                  </div>
+                <div className="absolute -bottom-0.5 -right-0.5">
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 rounded-full border-2 border-slate-900" />
                 </div>
               </div>
-              
+
               <div className="flex flex-col">
-                <div className="text-xl font-bold bg-gradient-to-r from-white via-yellow-100 to-amber-100 bg-clip-text text-transparent">
+                <div className="text-sm sm:text-base font-semibold text-white">
                   CineSensei
                 </div>
-                <div className="text-sm font-medium text-slate-400 flex items-center gap-2">
-                  <Zap className="w-3 h-3 text-yellow-400" />
+                <div className="text-xs font-normal text-slate-400">
                   AI Movie Expert
                 </div>
               </div>
             </SheetTitle>
-            
-            <div className="flex items-center gap-2">
+
+            <div className="flex items-center gap-1 sm:gap-2">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={resetChat}
-                className="h-9 w-9 text-slate-400 hover:text-white hover:bg-yellow-500/10 rounded-xl transition-all duration-200"
+                className="h-9 w-9 sm:h-8 sm:w-8 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors active:scale-95"
                 title="New Conversation"
               >
                 <RotateCcw className="w-4 h-4" />
@@ -260,16 +248,14 @@ export function FloatingChatButton() {
           </div>
 
           {!authUser && (
-            <div className="relative mt-4 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10 border border-blue-500/20 rounded-2xl p-4 backdrop-blur-sm overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5" />
-              <div className="relative flex items-start gap-3">
-                <div className="w-8 h-8 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Film className="w-4 h-4 text-blue-400" />
+            <div className="relative mt-2.5 sm:mt-3 bg-slate-800/50 border border-slate-700/50 rounded-lg p-2.5 sm:p-3 backdrop-blur-sm">
+              <div className="relative flex items-start gap-2">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-md bg-blue-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Film className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-blue-400" />
                 </div>
                 <div>
-                  <p className="text-slate-300 text-sm leading-relaxed">
-                    <span className="font-medium text-blue-300">Guest Mode Active</span> - You can chat without signing in! 
-                    Sign in later to get personalized recommendations based on your watchlist and preferences.
+                  <p className="text-slate-300 text-xs leading-relaxed">
+                    <span className="font-medium text-white">Guest Mode</span> - <span className="hidden sm:inline">Chat without signing in! Sign in later for personalized recommendations.</span><span className="sm:hidden">Sign in for personalized recs.</span>
                   </p>
                 </div>
               </div>
@@ -278,92 +264,52 @@ export function FloatingChatButton() {
         </SheetHeader>
 
         {/* Messages */}
-        <ScrollArea className="flex-1 px-6 bg-gradient-to-b from-slate-950/50 to-slate-900/50" ref={scrollAreaRef}>
-          <div className="space-y-6 py-6">
+        <ScrollArea className="flex-1 px-3 sm:px-6 bg-slate-950" ref={scrollAreaRef}>
+          <div className="space-y-3 sm:space-y-4 py-4 sm:py-6">
             {/* Welcome Message */}
             {messages.length === 0 && (
-              <div className="text-center py-12 px-4 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-                {/* Hero Avatar with Enhanced Animation */}
-                <div className="relative mx-auto mb-8 group animate-in zoom-in-50 fade-in-0 duration-300" style={{ animationDelay: '100ms' }}>
-                  <div className="w-20 h-20 bg-[#EAB308] rounded-3xl flex items-center justify-center shadow-2xl border border-yellow-400/30 transform group-hover:scale-105 transition-all duration-300">
-                    <MessageCircle className="w-10 h-10 text-white" />
-                  </div>
-                  {/* Simple animated rings */}
-                  <div className="absolute inset-0 rounded-3xl bg-yellow-400/20 blur-xl animate-pulse" />
-                  <div className="absolute -inset-2 rounded-3xl bg-yellow-600/10 blur-2xl animate-ping" style={{ animationDuration: '2s' }} />
-                  
-                  {/* Simple floating particles */}
-                  <div className="absolute -top-2 -right-2">
-                    <Stars className="w-4 h-4 text-yellow-400 animate-bounce" style={{ animationDelay: '0s' }} />
-                  </div>
-                  <div className="absolute -bottom-2 -left-2">
-                    <Sparkles className="w-3 h-3 text-yellow-400 animate-bounce" style={{ animationDelay: '1s' }} />
-                  </div>
-                  <div className="absolute top-0 left-8">
-                    <div className="w-2 h-2 bg-yellow-400 rounded-full animate-ping" style={{ animationDelay: '2s' }} />
+              <div className="text-center py-6 sm:py-8 px-3 sm:px-4 max-w-2xl mx-auto">
+                {/* Clean Hero Avatar */}
+                <div className="relative mx-auto mb-4 sm:mb-6 w-14 h-14 sm:w-16 sm:h-16">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-xl">
+                    <MessageCircle className="w-7 h-7 sm:w-8 sm:h-8 text-white" strokeWidth={2.5} />
                   </div>
                 </div>
 
-                {/* Welcome Text with Gradient */}
-                <div className="space-y-4 mb-8 animate-in fade-in-0 slide-in-from-bottom-2 duration-300" style={{ animationDelay: '200ms' }}>
-                  <h3 className="text-3xl font-bold bg-gradient-to-r from-white via-yellow-100 to-amber-100 bg-clip-text text-transparent">
+                {/* Welcome Text */}
+                <div className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white">
                     Welcome to CineSensei
                   </h3>
-                  <div className="flex items-center justify-center gap-2 text-lg animate-in fade-in-0 slide-in-from-bottom-1 duration-300" style={{ animationDelay: '300ms' }}>
-                    <Film className="w-5 h-5 text-yellow-400" />
-                    <span className="text-slate-300 font-medium">Your AI Movie Expert</span>
-                    <Zap className="w-4 h-4 text-yellow-400" />
-                  </div>
-                  <p className="text-slate-400 max-w-lg mx-auto leading-relaxed text-sm animate-in fade-in-0 slide-in-from-bottom-1 duration-300" style={{ animationDelay: '400ms' }}>
-                    Get personalized movie recommendations, detailed reviews, and discover your next favorite film. 
-                    I analyze your preferences to suggest movies you'll love!
+                  <p className="text-slate-400 text-xs sm:text-sm leading-relaxed max-w-md mx-auto px-2">
+                    Get personalized movie recommendations, detailed reviews, and discover your next favorite film.
                   </p>
                 </div>
 
-                {/* Enhanced Suggested Prompts */}
+                {/* Suggested Prompts */}
                 {showSuggestions && (
-                  <div className="space-y-6 animate-in fade-in-0 slide-in-from-bottom-2 duration-300" style={{ animationDelay: '500ms' }}>
-                    <div className="flex items-center justify-center gap-3 animate-in fade-in-0 duration-300" style={{ animationDelay: '600ms' }}>
-                      <div className="h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent flex-1" />
-                      <div className="flex items-center gap-2 text-slate-500 text-sm font-medium">
-                        <Sparkles className="w-4 h-4 text-yellow-400" />
-                        Try these suggestions
-                        <Sparkles className="w-4 h-4 text-yellow-400" />
-                      </div>
-                      <div className="h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent flex-1" />
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="flex items-center justify-center gap-2 text-slate-500 text-xs font-medium mb-3 sm:mb-4">
+                      <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-yellow-500" />
+                      <span>Try asking</span>
                     </div>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-3xl mx-auto">
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-2xl mx-auto">
                       {SUGGESTED_PROMPTS.map((prompt, index) => (
                         <Button
                           key={index}
                           variant="outline"
                           onClick={() => handleSuggestedPrompt(prompt)}
-                          className="group relative bg-gradient-to-br from-slate-800/50 to-slate-700/50 border border-slate-600/30 text-slate-300 hover:text-white hover:border-yellow-500/50 hover:bg-gradient-to-br hover:from-yellow-900/20 hover:to-amber-900/20 text-left justify-start h-auto py-4 px-4 rounded-2xl backdrop-blur-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-xl hover:shadow-yellow-500/10 animate-in fade-in-0 slide-in-from-bottom-1 duration-200"
-                          style={{ animationDelay: `${700 + index * 50}ms` }}
+                          className="group bg-slate-900 border-slate-800 text-slate-300 hover:text-white hover:border-yellow-500/40 hover:bg-slate-800 active:scale-98 text-left justify-start h-auto py-3 sm:py-3 px-3 sm:px-3.5 rounded-lg transition-all duration-200 touch-manipulation"
                         >
-                          <div className="flex items-start gap-3 w-full">
-                            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-yellow-500/20 to-amber-500/20 flex items-center justify-center flex-shrink-0 group-hover:from-yellow-500/30 group-hover:to-amber-500/30 transition-all duration-200">
-                              <Sparkles className="w-4 h-4 text-yellow-400 group-hover:scale-110 transition-transform duration-200" />
+                          <div className="flex items-center gap-2 sm:gap-2.5 w-full">
+                            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-800 group-hover:bg-yellow-500/10 flex items-center justify-center flex-shrink-0 transition-colors">
+                              <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-yellow-500" />
                             </div>
-                            <div className="text-left">
-                              <span className="text-sm font-medium block leading-relaxed">{prompt}</span>
-                            </div>
+                            <span className="text-xs font-medium leading-relaxed">{prompt}</span>
                           </div>
-                          
-                          {/* Hover effect overlay */}
-                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-yellow-600/5 to-amber-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                         </Button>
                       ))}
-                    </div>
-
-                    {/* Call to Action */}
-                    <div className="mt-8 p-4 bg-gradient-to-r from-slate-800/30 to-slate-700/30 rounded-2xl border border-slate-600/20 backdrop-blur-sm animate-in fade-in-0 slide-in-from-bottom-1 duration-200" style={{ animationDelay: '1000ms' }}>
-                      <div className="flex items-center justify-center gap-2 text-slate-400 text-sm">
-                        <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
-                        <span>Ready to discover your next favorite movie?</span>
-                        <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
-                      </div>
                     </div>
                   </div>
                 )}
@@ -375,58 +321,53 @@ export function FloatingChatButton() {
               <div
                 key={message.id}
                 className={cn(
-                  "flex gap-4 group animate-in fade-in-50 slide-in-from-bottom-2",
+                  "flex gap-2 sm:gap-3 group",
                   message.role === "user" ? "justify-end" : "justify-start"
                 )}
-                style={{ animationDelay: `${index * 100}ms` }}
               >
                 {message.role === "assistant" && (
-                  <div className="relative flex-shrink-0 mt-1">
-                    <div className="w-9 h-9 bg-[#EAB308] rounded-2xl flex items-center justify-center shadow-lg border border-yellow-400/30">
-                      <MessageCircle className="w-5 h-5 text-white" />
+                  <div className="flex-shrink-0 mt-1">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-lg flex items-center justify-center shadow-md">
+                      <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" strokeWidth={2.5} />
                     </div>
-                    {/* Simple glow for AI avatar */}
-                    <div className="absolute inset-0 rounded-2xl bg-yellow-400/20 blur-sm group-hover:blur-md transition-all duration-200" />
                   </div>
                 )}
 
-                <div className="flex flex-col max-w-[85%] min-w-0">
+                <div className="flex flex-col max-w-[85%] sm:max-w-[80%] min-w-0">
                   <div
                     className={cn(
-                      "rounded-3xl px-5 py-4 text-sm shadow-xl transition-all duration-300",
+                      "rounded-2xl px-3 py-2.5 sm:px-4 sm:py-3 text-sm shadow-lg",
                       message.role === "user"
-                        ? "bg-gradient-to-br from-blue-600 to-purple-600 text-white border border-blue-500/30 shadow-blue-500/20 ml-auto"
-                        : "bg-gradient-to-br from-slate-800 to-slate-700 text-slate-100 border border-slate-600/50 shadow-slate-900/50 backdrop-blur-sm",
+                        ? "bg-yellow-500 text-white ml-auto"
+                        : "bg-slate-900 text-slate-100 border border-slate-800",
                     )}
                   >
                     {message.content ? (
-                      <div 
-                        className="leading-relaxed [&>strong]:font-semibold [&>strong]:text-white [&>em]:italic [&>em]:text-slate-200"
+                      <div
+                        className="leading-relaxed [&>strong]:font-semibold [&>strong]:text-white [&>em]:italic text-xs sm:text-sm"
                         dangerouslySetInnerHTML={{ __html: parseMarkdown(message.content) }}
                       />
                     ) : (
                       <div className="flex items-center gap-2 text-slate-400">
-                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" />
-                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                        <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                        <span className="text-xs ml-2">Thinking...</span>
+                        <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-bounce" />
+                        <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                        <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                        <span className="text-xs ml-1.5">Thinking...</span>
                       </div>
                     )}
                   </div>
 
                   {message.role === "assistant" && message.content && (
-                    <div className="flex items-center gap-2 mt-2 ml-2">
-                      <Badge variant="secondary" className="bg-slate-800/80 text-slate-400 text-xs border border-slate-700/50 backdrop-blur-sm">
-                        <Sparkles className="w-3 h-3 mr-1 text-yellow-400" />
-                        AI Generated
-                      </Badge>
+                    <div className="flex items-center gap-1.5 mt-1.5 ml-1">
+                      <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-600" />
+                      <span className="text-xs text-slate-600">AI</span>
                     </div>
                   )}
                 </div>
 
                 {message.role === "user" && (
-                  <div className="w-9 h-9 bg-gradient-to-br from-slate-700 to-slate-600 rounded-2xl flex items-center justify-center flex-shrink-0 mt-1 shadow-lg border border-slate-500/50">
-                    <User className="w-5 h-5 text-slate-300" />
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-slate-800 rounded-lg flex items-center justify-center flex-shrink-0 mt-1 shadow-md border border-slate-700">
+                    <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" />
                   </div>
                 )}
               </div>
@@ -434,22 +375,20 @@ export function FloatingChatButton() {
 
             {/* Loading State */}
             {isLoading && (
-              <div className="flex gap-4 justify-start animate-in fade-in-50 slide-in-from-bottom-2">
-                <div className="relative flex-shrink-0 mt-1">
-                  <div className="w-9 h-9 bg-[#EAB308] rounded-2xl flex items-center justify-center shadow-lg border border-yellow-400/30">
-                    <MessageCircle className="w-5 h-5 text-white animate-pulse" />
+              <div className="flex gap-2 sm:gap-3 justify-start">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-lg flex items-center justify-center shadow-md">
+                    <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white animate-pulse" strokeWidth={2.5} />
                   </div>
-                  <div className="absolute inset-0 rounded-2xl bg-yellow-400/20 blur-md animate-pulse" />
                 </div>
-                <div className="bg-gradient-to-br from-slate-800 to-slate-700 text-slate-100 border border-slate-600/50 shadow-slate-900/50 backdrop-blur-sm rounded-3xl px-5 py-4">
-                  <div className="flex items-center gap-3">
+                <div className="bg-slate-900 text-slate-100 border border-slate-800 rounded-2xl px-3 py-2.5 sm:px-4 sm:py-3 shadow-lg">
+                  <div className="flex items-center gap-2">
                     <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                      <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                      <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-bounce"></div>
+                      <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+                      <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
                     </div>
-                    <span className="text-sm text-slate-300 font-medium">CineSensei is thinking...</span>
-                    <Sparkles className="w-4 h-4 text-yellow-400 animate-pulse" />
+                    <span className="text-xs sm:text-sm text-slate-300">Thinking...</span>
                   </div>
                 </div>
               </div>
@@ -457,25 +396,23 @@ export function FloatingChatButton() {
 
             {/* Error State */}
             {error && (
-              <div className="bg-gradient-to-br from-red-900/20 to-red-800/10 border border-red-500/30 rounded-2xl p-6 text-center backdrop-blur-sm animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
-                <div className="flex items-center justify-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-red-500/20 rounded-2xl flex items-center justify-center">
-                    <AlertCircle className="w-5 h-5 text-red-400" />
+              <div className="bg-red-950/50 border border-red-900/50 rounded-lg p-3 sm:p-4 text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+                    <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-400" />
                   </div>
-                  <div>
-                    <p className="text-red-300 text-sm font-medium">Oops! Something went wrong.</p>
-                  </div>
+                  <p className="text-red-300 text-xs sm:text-sm font-medium">Something went wrong</p>
                 </div>
-                <p className="text-red-400/80 text-xs mb-4 max-w-sm mx-auto leading-relaxed">
-                  {error.message || "I'm having trouble connecting to my AI brain right now. Please try again!"}
+                <p className="text-red-400/80 text-xs mb-3 max-w-sm mx-auto">
+                  {error.message || "Please try again"}
                 </p>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => reload()}
-                  className="border-red-500/30 text-red-300 hover:bg-red-500/10 hover:border-red-400/50 hover:text-red-200 rounded-xl transition-all duration-200 hover:scale-105"
+                  className="border-red-800 text-red-300 hover:bg-red-950 hover:border-red-700 rounded-lg active:scale-95 touch-manipulation"
                 >
-                  <RotateCcw className="w-3 h-3 mr-2" />
+                  <RotateCcw className="w-3 h-3 mr-1.5" />
                   Try Again
                 </Button>
               </div>
@@ -483,100 +420,64 @@ export function FloatingChatButton() {
           </div>
         </ScrollArea>
 
-        {/* Enhanced Input Form */}
-        <div className="relative border-t border-gradient-to-r from-purple-500/20 via-blue-500/20 to-cyan-500/20 bg-gradient-to-r from-slate-900/80 via-gray-900/80 to-slate-900/80 backdrop-blur-sm p-6">
-          {/* Background pattern */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(120,119,198,0.05),transparent_70%)]" />
-          
+        {/* Input Form */}
+        <div className="relative border-t border-slate-800 bg-slate-900/95 backdrop-blur-lg p-3 sm:p-4 pb-safe">
           <div className="relative">
-            <form onSubmit={handleFormSubmit} className="flex items-end gap-4">
-              <div className="flex-1 relative group">
-                {/* Enhanced textarea with gradient border */}
-                <div className="relative">
-                  <Textarea
-                    value={input}
-                    onChange={handleInputChange}
-                    placeholder="Ask me about movies, get recommendations, or request reviews..."
-                    className="bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 text-white placeholder:text-slate-400 resize-none min-h-[52px] max-h-32 rounded-2xl px-4 py-3 pr-12 backdrop-blur-sm focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 focus:bg-slate-800/95 transition-all duration-300 shadow-lg group-hover:border-slate-500/70"
-                    rows={1}
-                    disabled={isLoading}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault()
-                        handleFormSubmit(e)
-                      }
-                    }}
-                  />
-                  
-                  {/* Character count indicator */}
-                  {input.length > 100 && (
-                    <div className="absolute bottom-2 right-3 text-xs text-slate-500">
-                      {input.length}/500
-                    </div>
-                  )}
-                  
-                  {/* Glow effect on focus */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-600/10 to-blue-600/10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                </div>
-
-                {/* Typing indicator */}
-                {isLoading && (
-                  <div className="absolute -top-8 left-0 flex items-center gap-2 text-xs text-slate-400 bg-slate-800/90 px-3 py-1 rounded-full border border-slate-600/50 backdrop-blur-sm">
-                    <div className="flex gap-1">
-                      <div className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce"></div>
-                      <div className="w-1 h-1 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                      <div className="w-1 h-1 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                    </div>
-                    <span>CineSensei is responding...</span>
-                  </div>
-                )}
+            <form onSubmit={handleFormSubmit} className="flex items-end gap-2 sm:gap-3">
+              <div className="flex-1 relative">
+                <Textarea
+                  value={input}
+                  onChange={handleInputChange}
+                  placeholder="Ask about movies..."
+                  className="bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 resize-none min-h-[44px] sm:min-h-[48px] max-h-32 rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/20 transition-colors shadow-sm touch-manipulation"
+                  rows={1}
+                  disabled={isLoading}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault()
+                      handleFormSubmit(e)
+                    }
+                  }}
+                />
               </div>
 
-              {/* Enhanced send button */}
+              {/* Send button */}
               <Button
                 type="submit"
                 size="icon"
-                className="relative group bg-[#EAB308] hover:bg-[#D97706] text-white rounded-2xl h-12 w-12 shadow-xl border border-yellow-400/30 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="bg-gradient-to-br from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700 active:scale-95 text-white rounded-xl h-11 w-11 sm:h-12 sm:w-12 shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation flex-shrink-0"
                 disabled={isLoading || !input.trim()}
               >
-                <div className="relative">
-                  {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <Send className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  )}
-                </div>
-                
-                {/* Button glow effect */}
-                <div className="absolute inset-0 rounded-2xl bg-yellow-400/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                {isLoading ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4 sm:h-4.5 sm:w-4.5" strokeWidth={2.5} />
+                )}
               </Button>
             </form>
 
-            {/* Enhanced footer with better styling */}
-            <div className="flex items-center justify-between mt-4">
-              <div className="flex items-center gap-4 text-xs">
-                <div className="flex items-center gap-2 text-slate-500">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
-                  <span>AI Ready</span>
+            {/* Footer */}
+            <div className="flex items-center justify-between mt-2 sm:mt-3">
+              <div className="flex items-center gap-2 sm:gap-3 text-xs text-slate-500">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                  <span className="text-xs">Ready</span>
                 </div>
-                <div className="text-slate-600">•</div>
-                <span className="text-slate-500">Press Enter to send • Shift+Enter for new line</span>
+                <span className="text-slate-700 hidden sm:inline">•</span>
+                <span className="hidden sm:inline text-xs">Enter to send • Shift+Enter for new line</span>
               </div>
-              
-              {/* Quick actions */}
-              <div className="flex items-center gap-2">
-                {messages.length > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={reload}
-                    className="h-7 px-3 text-xs text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 rounded-lg transition-all duration-200"
-                  >
-                    <RotateCcw className="w-3 h-3 mr-1" />
-                    Clear
-                  </Button>
-                )}
-              </div>
+
+              {messages.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={reload}
+                  className="h-7 px-2 text-xs text-slate-500 hover:text-slate-300 hover:bg-slate-800 active:scale-95 rounded-lg touch-manipulation"
+                >
+                  <RotateCcw className="w-3 h-3 mr-1" />
+                  Clear
+                </Button>
+              )}
             </div>
           </div>
         </div>

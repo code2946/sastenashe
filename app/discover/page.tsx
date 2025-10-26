@@ -14,6 +14,7 @@ import MovieGrid from "@/components/movie-grid"
 import { OptimizedImage } from "@/components/optimized-image"
 import { ultraFastImageLoader } from "@/lib/ultra-fast-image"
 import { AuthModal } from "@/components/lazy-components"
+import { PopularMoviesCarousel } from "@/components/popular-movies-carousel"
 import { supabase, type WatchlistItem } from "@/lib/supabase"
 import {
   getGenres,
@@ -24,18 +25,27 @@ import {
   getIndianMovies,
   getBollywoodMovies,
   getHindiMovies,
+  getPopularSeries,
+  getTopRatedSeries,
+  searchSeries,
+  discoverSeries,
+  getIndianSeries,
+  getHindiSeries,
   getImageUrl,
   type TMDBMovie,
+  type TMDBSeries,
   type TMDBGenre,
 } from "@/lib/tmdb-supabase"
 import { getYear } from "@/lib/date"
 
 export default function MovieRecommender() {
+  const [mediaType, setMediaType] = useState<"movie" | "series">("movie")
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedGenres, setSelectedGenres] = useState<number[]>([])
   const [minRating, setMinRating] = useState("0")
   const [sortBy, setSortBy] = useState("popularity.desc")
   const [movies, setMovies] = useState<TMDBMovie[]>([])
+  const [series, setSeries] = useState<TMDBSeries[]>([])
   const [genres, setGenres] = useState<TMDBGenre[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
@@ -44,12 +54,14 @@ export default function MovieRecommender() {
   const [hasMore, setHasMore] = useState(true)
   const [selectedCountryFilter, setSelectedCountryFilter] = useState<"all" | "indian" | "bollywood" | "hindi">("all")
   const [featuredMovie, setFeaturedMovie] = useState<TMDBMovie | null>(null)
+  const [featuredSeries, setFeaturedSeries] = useState<TMDBSeries | null>(null)
   const [showFilters, setShowFilters] = useState(false)
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([])
   const [authUser, setAuthUser] = useState<any | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const router = useRouter()
   const [missingTable, setMissingTable] = useState(false)
+  const [watchedMovies, setWatchedMovies] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     const loadGenres = async () => {
@@ -508,6 +520,18 @@ export default function MovieRecommender() {
     // User state will be updated by the auth state change listener
   }
 
+  const handleMarkAsWatched = useCallback((movieId: string) => {
+    setWatchedMovies((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(movieId)) {
+        newSet.delete(movieId)
+      } else {
+        newSet.add(movieId)
+      }
+      return newSet
+    })
+  }, [])
+
   if (missingTable) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white p-8">
@@ -535,11 +559,44 @@ export default function MovieRecommender() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-2">
             {/* Logo */}
-            <div className="flex items-center gap-2 cursor-pointer flex-shrink-0" onClick={() => router.push('/')}>
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-yellow-500 rounded-lg flex items-center justify-center">
-                <span className="text-black font-bold text-lg md:text-xl">S</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 cursor-pointer flex-shrink-0" onClick={() => router.push('/')}>
+                <OptimizedImage
+                  src="/logo.png"
+                  alt="Screen On Fire"
+                  width={40}
+                  height={40}
+                  className="w-8 h-8 md:w-10 md:h-10 object-contain"
+                  priority={true}
+                />
+                <span className="text-lg md:text-xl font-bold hidden sm:inline">ScreenOnFire</span>
               </div>
-              <span className="text-lg md:text-xl font-bold hidden sm:inline">ScreenOnFire</span>
+
+              {/* Movies/Series Toggle */}
+              <div className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-lg p-1">
+                <button
+                  onClick={() => setMediaType("movie")}
+                  className={`px-3 py-1.5 text-sm font-semibold rounded transition-all duration-200 ${
+                    mediaType === "movie"
+                      ? "bg-yellow-500 text-black"
+                      : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  <Film className="h-4 w-4 inline mr-1" />
+                  <span className="hidden md:inline">Movies</span>
+                </button>
+                <button
+                  onClick={() => setMediaType("series")}
+                  className={`px-3 py-1.5 text-sm font-semibold rounded transition-all duration-200 ${
+                    mediaType === "series"
+                      ? "bg-yellow-500 text-black"
+                      : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  <Play className="h-4 w-4 inline mr-1" />
+                  <span className="hidden md:inline">Series</span>
+                </button>
+              </div>
             </div>
 
             {/* Desktop Navigation */}
@@ -650,23 +707,26 @@ export default function MovieRecommender() {
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero Section - IMDb Inspired */}
       {featuredMovie && (
-        <section className="relative h-[50vh] sm:h-[60vh] lg:h-[70vh] overflow-hidden">
+        <section className="relative h-[60vh] sm:h-[70vh] lg:h-[85vh] overflow-hidden border-b border-gray-800">
+          {/* Background Image with Parallax Effect */}
           <div
-            className="absolute inset-0 bg-cover bg-center"
+            className="absolute inset-0 bg-cover bg-center transform scale-105 transition-transform duration-700"
             style={{
-              backgroundImage: `url(${getImageUrl(featuredMovie.backdrop_path, "w780")})`,
+              backgroundImage: `url(${getImageUrl(featuredMovie.backdrop_path, "original")})`,
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/40 md:via-black/70 md:to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+            {/* Enhanced Gradient Overlays */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/95 to-black/60 md:via-black/90 md:to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black" />
           </div>
 
           <div className="relative z-10 max-w-7xl mx-auto px-4 h-full flex items-center">
             <div className="w-full">
               <div className="relative">
-                {/* Navigation Arrows */}
+                {/* Enhanced Navigation Arrows */}
                 <Button
                   variant="ghost"
                   size="icon"
@@ -675,9 +735,9 @@ export default function MovieRecommender() {
                     const prevIndex = currentIndex > 0 ? currentIndex - 1 : movies.length - 1
                     setFeaturedMovie(movies[prevIndex])
                   }}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 text-white hover:bg-white/20 h-10 w-10 md:h-12 md:w-12 rounded-full"
+                  className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 bg-black/70 hover:bg-yellow-500 text-white hover:text-black h-12 w-12 md:h-14 md:w-14 rounded-full backdrop-blur-sm transition-all duration-300 border border-white/20 hover:border-yellow-500 hover:scale-110 shadow-xl"
                 >
-                  <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
+                  <ChevronLeft className="h-6 w-6 md:h-7 md:w-7" />
                 </Button>
 
                 <Button
@@ -688,48 +748,64 @@ export default function MovieRecommender() {
                     const nextIndex = currentIndex < movies.length - 1 ? currentIndex + 1 : 0
                     setFeaturedMovie(movies[nextIndex])
                   }}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 text-white hover:bg-white/20 h-10 w-10 md:h-12 md:w-12 rounded-full"
+                  className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 bg-black/70 hover:bg-yellow-500 text-white hover:text-black h-12 w-12 md:h-14 md:w-14 rounded-full backdrop-blur-sm transition-all duration-300 border border-white/20 hover:border-yellow-500 hover:scale-110 shadow-xl"
                 >
-                  <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
+                  <ChevronRight className="h-6 w-6 md:h-7 md:w-7" />
                 </Button>
 
                 <div className="mx-12 md:mx-16">
                   <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 items-center">
-                    {/* Content - Shows first on mobile */}
-                    <div className="order-2 lg:order-1 space-y-3 sm:space-y-4 lg:space-y-6">
-                      <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight">
-                        {featuredMovie.title}
-                      </h1>
+                    {/* Enhanced Content Section */}
+                    <div className="order-2 lg:order-1 space-y-4 sm:space-y-5 lg:space-y-7 animate-in fade-in slide-in-from-left duration-700">
+                      {/* Title with Gradient */}
+                      <div className="space-y-2">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black leading-tight tracking-tight">
+                          <span className="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent drop-shadow-2xl">
+                            {featuredMovie.title}
+                          </span>
+                        </h1>
+                      </div>
 
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-                        <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 sm:h-5 sm:w-5 fill-yellow-500 text-yellow-500" />
-                          <span className="text-base sm:text-lg font-semibold">{featuredMovie.vote_average.toFixed(1)}</span>
+                      {/* Rating & Meta Info */}
+                      <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                        <div className="flex items-center gap-2 bg-black/40 border border-gray-700 backdrop-blur-sm rounded-lg px-3 py-1.5">
+                          <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                          <span className="text-base font-semibold text-white">{featuredMovie.vote_average.toFixed(1)}</span>
+                          <span className="text-gray-400 text-xs">/10</span>
                         </div>
-                        <span className="text-base sm:text-lg">{getYear(featuredMovie.release_date)}</span>
-                        <Badge className="bg-yellow-500 text-black font-semibold text-xs sm:text-sm">
-                          #{(movies.findIndex((m) => m.id === featuredMovie?.id) || 0) + 1}
+                        <div className="h-5 w-px bg-gray-700" />
+                        <span className="text-base font-medium text-gray-300">{getYear(featuredMovie.release_date)}</span>
+                        <div className="h-5 w-px bg-gray-700" />
+                        <Badge className="bg-gray-800 border border-gray-700 text-gray-300 font-medium text-xs px-2.5 py-1">
+                          #{(movies.findIndex((m) => m.id === featuredMovie?.id) || 0) + 1} Trending
                         </Badge>
                       </div>
 
+                      {/* Genre Tags */}
                       <div className="flex flex-wrap gap-2">
                         {getMovieGenres(featuredMovie)
                           .slice(0, 3)
                           .map((genre) => (
-                            <Badge key={genre} variant="outline" className="border-gray-600 text-gray-300 text-xs">
+                            <Badge
+                              key={genre}
+                              variant="outline"
+                              className="border-gray-700 bg-black/40 backdrop-blur-sm text-gray-300 text-xs px-2.5 py-1 cursor-default"
+                            >
                               {genre}
                             </Badge>
                           ))}
                       </div>
 
-                      <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-300 leading-relaxed line-clamp-2 sm:line-clamp-3 lg:line-clamp-4">
+                      {/* Overview - Better Typography */}
+                      <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 leading-relaxed line-clamp-2 sm:line-clamp-3 lg:line-clamp-4 max-w-3xl font-light">
                         {featuredMovie.overview}
                       </p>
 
-                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                      {/* Enhanced Action Buttons - IMDb Style */}
+                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2">
                         <Button
-                          size="sm"
-                          className="bg-white text-black hover:bg-gray-200 font-semibold sm:size-default"
+                          size="lg"
+                          className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold shadow-2xl hover:shadow-yellow-500/50 transition-all duration-300 hover:scale-105 group"
                           onClick={() => {
                             window.open(
                               `https://www.youtube.com/results?search_query=${encodeURIComponent(featuredMovie.title + " trailer")}`,
@@ -737,45 +813,68 @@ export default function MovieRecommender() {
                             )
                           }}
                         >
-                          <Play className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                          <Play className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
                           Watch Trailer
                         </Button>
                         <Button
-                          size="sm"
+                          size="lg"
                           variant="outline"
-                          className="border-gray-600 text-white hover:bg-gray-800 bg-transparent sm:size-default"
+                          className={`border-2 font-semibold transition-all duration-300 hover:scale-105 shadow-lg ${
+                            isInWatchlist(featuredMovie.id.toString())
+                              ? "border-yellow-500 text-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20"
+                              : "border-white/40 text-white hover:border-white hover:bg-white/10"
+                          }`}
                           onClick={() => addToWatchlist(featuredMovie)}
                           disabled={isInWatchlist(featuredMovie.id.toString())}
                         >
                           <Heart
-                            className={`h-4 w-4 sm:h-5 sm:w-5 mr-2 transition-all duration-300 ${
-                              isInWatchlist(featuredMovie.id.toString()) ? "fill-current text-red-500" : ""
+                            className={`h-5 w-5 mr-2 transition-all duration-300 ${
+                              isInWatchlist(featuredMovie.id.toString()) ? "fill-current scale-110" : ""
                             }`}
                           />
                           <span className="hidden sm:inline">{isInWatchlist(featuredMovie.id.toString()) ? "In Watchlist" : "Add to Watchlist"}</span>
                           <span className="sm:hidden">{isInWatchlist(featuredMovie.id.toString()) ? "Added" : "Add"}</span>
                         </Button>
+                        <Button
+                          size="lg"
+                          variant="ghost"
+                          className="border border-white/20 text-white hover:bg-white/10 hover:border-white/40 font-semibold transition-all duration-300"
+                          onClick={() => router.push(`/movies/${featuredMovie.id}`)}
+                        >
+                          More Info
+                        </Button>
                       </div>
                     </div>
 
-                    {/* Poster - Hidden on very small screens, shown on sm+ */}
-                    <div className="order-1 lg:order-2 hidden sm:flex justify-center lg:justify-end">
-                      <div className="relative group">
-                        <div className="w-32 sm:w-40 md:w-48 lg:w-64 xl:w-80 aspect-[2/3] rounded-lg overflow-hidden shadow-2xl transform transition-transform duration-500 group-hover:scale-105">
+                    {/* Enhanced Poster - IMDb Style */}
+                    <div className="order-1 lg:order-2 hidden sm:flex justify-center lg:justify-end animate-in fade-in slide-in-from-right duration-700">
+                      <div className="relative group cursor-pointer" onClick={() => router.push(`/movies/${featuredMovie.id}`)}>
+                        {/* Glow Effect */}
+                        <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-40 transition-all duration-500" />
+
+                        {/* Poster Container */}
+                        <div className="relative w-40 sm:w-48 md:w-56 lg:w-72 xl:w-80 aspect-[2/3] rounded-xl overflow-hidden shadow-xl transform transition-all duration-300 group-hover:scale-102 border border-gray-800 group-hover:border-gray-700">
                           <OptimizedImage
-                            src={getImageUrl(featuredMovie.poster_path, "w342") || "/placeholder.svg"}
+                            src={getImageUrl(featuredMovie.poster_path, "w500") || "/placeholder.svg"}
                             alt={featuredMovie.title}
                             className="w-full h-full object-cover"
                             priority={true}
-                            width={320}
-                            height={480}
+                            width={400}
+                            height={600}
                             blur={false}
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          {/* Hover Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
+                            <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                              <p className="text-white text-sm font-semibold">Click for details</p>
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 bg-yellow-500 text-black rounded-full w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 flex items-center justify-center font-bold text-xs sm:text-sm lg:text-lg shadow-lg">
-                          {featuredMovie.vote_average.toFixed(1)}
+                        {/* Rating Badge */}
+                        <div className="absolute -top-2 -right-2 bg-black/90 backdrop-blur-sm text-white rounded-lg p-2 flex flex-col items-center justify-center font-semibold shadow-xl border border-gray-700">
+                          <Star className="h-3 w-3 fill-yellow-500 text-yellow-500 mb-0.5" />
+                          <span className="text-sm">{featuredMovie.vote_average.toFixed(1)}</span>
                         </div>
                       </div>
                     </div>
@@ -788,44 +887,67 @@ export default function MovieRecommender() {
         </section>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold">
-            {activeTab === "popular" && "Popular Movies"}
-            {activeTab === "top-rated" && "Top Rated Movies"}
-            {activeTab === "search" && `Search Results for "${searchQuery}"`}
-            {activeTab === "discover" && "Discover Movies"}
-            {activeTab === "indian" && "🇮🇳 Indianise"}
-            {activeTab === "bollywood" && "🎬 Bollywood Movies"}
-            {activeTab === "hindi" && "🗣️ Hindi Movies"}
-          </h2>
+      {/* Main Content Section - Enhanced Layout */}
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        {/* Section Header - IMDb Style */}
+        <div className="flex items-center justify-between mb-10 pb-6 border-b border-gray-800">
+          <div className="space-y-2">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight">
+              <span className="bg-gradient-to-r from-white via-gray-100 to-gray-400 bg-clip-text text-transparent">
+                {activeTab === "popular" && "Popular Movies"}
+                {activeTab === "top-rated" && "Top Rated Movies"}
+                {activeTab === "search" && `Search Results for "${searchQuery}"`}
+                {activeTab === "discover" && "Discover Movies"}
+                {activeTab === "indian" && "🇮🇳 Indianise"}
+                {activeTab === "bollywood" && "🎬 Bollywood Movies"}
+                {activeTab === "hindi" && "🗣️ Hindi Movies"}
+              </span>
+            </h2>
+            <p className="text-gray-400 text-sm md:text-base">
+              {movies.length > 0 ? `Showing ${movies.length} ${movies.length === 1 ? 'movie' : 'movies'}` : 'Loading movies...'}
+            </p>
+          </div>
 
           <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
-            className="border-gray-700 text-white bg-gray-800"
+            className={`border-2 font-semibold transition-all duration-300 hover:scale-105 ${
+              showFilters
+                ? "border-yellow-500 text-yellow-500 bg-yellow-500/10"
+                : "border-gray-600 text-white bg-gray-900 hover:border-yellow-500"
+            }`}
           >
             <Filter className="h-4 w-4 mr-2" />
             Filters
           </Button>
         </div>
 
-        {/* Filters Panel */}
+        {/* Enhanced Filters Panel */}
         {showFilters && (
-          <Card className="bg-gray-900 border-gray-800 mb-8">
-            <CardContent className="p-4 sm:p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+          <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-2 border-gray-800 mb-10 shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-b border-gray-800 p-4">
+              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <Filter className="h-5 w-5 text-yellow-500" />
+                Advanced Filters
+              </h3>
+            </div>
+            <CardContent className="p-6 sm:p-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8">
                 <div className="sm:col-span-2 lg:col-span-1">
-                  <label className="text-sm font-medium mb-3 block text-gray-300">Genres</label>
-                  <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700">
+                  <label className="text-sm font-bold mb-4 block text-white uppercase tracking-wider">Genres</label>
+                  <div className="grid grid-cols-2 gap-3 max-h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-yellow-500/20 scrollbar-track-gray-800 pr-2">
                     {genres.slice(0, 8).map((genre) => (
-                      <div key={genre.id} className="flex items-center space-x-2">
+                      <div key={genre.id} className="flex items-center space-x-2 group">
                         <Checkbox
                           id={`genre-${genre.id}`}
                           checked={selectedGenres.includes(genre.id)}
                           onCheckedChange={(checked) => handleGenreChange(genre.id, checked as boolean)}
+                          className="border-gray-600 data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-500"
                         />
-                        <label htmlFor={`genre-${genre.id}`} className="text-xs sm:text-sm text-gray-300 cursor-pointer">
+                        <label
+                          htmlFor={`genre-${genre.id}`}
+                          className="text-sm text-gray-300 cursor-pointer group-hover:text-yellow-500 transition-colors font-medium"
+                        >
                           {genre.name}
                         </label>
                       </div>
@@ -834,47 +956,47 @@ export default function MovieRecommender() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block text-gray-300">Min Rating</label>
+                  <label className="text-sm font-bold mb-3 block text-white uppercase tracking-wider">Min Rating</label>
                   <Select value={minRating} onValueChange={setMinRating}>
-                    <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                    <SelectTrigger className="bg-gray-800/50 border-gray-700 text-white hover:border-yellow-500 transition-colors">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700">
-                      <SelectItem value="0">Any</SelectItem>
-                      <SelectItem value="6">6.0+</SelectItem>
-                      <SelectItem value="7">7.0+</SelectItem>
-                      <SelectItem value="8">8.0+</SelectItem>
-                      <SelectItem value="9">9.0+</SelectItem>
+                    <SelectContent className="bg-gray-900 border-gray-700">
+                      <SelectItem value="0" className="hover:bg-yellow-500/20">Any</SelectItem>
+                      <SelectItem value="6" className="hover:bg-yellow-500/20">⭐ 6.0+</SelectItem>
+                      <SelectItem value="7" className="hover:bg-yellow-500/20">⭐ 7.0+</SelectItem>
+                      <SelectItem value="8" className="hover:bg-yellow-500/20">⭐ 8.0+</SelectItem>
+                      <SelectItem value="9" className="hover:bg-yellow-500/20">⭐ 9.0+</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block text-gray-300">Region</label>
+                  <label className="text-sm font-bold mb-3 block text-white uppercase tracking-wider">Region</label>
                   <Select value={selectedCountryFilter} onValueChange={(value: "all" | "indian" | "bollywood" | "hindi") => setSelectedCountryFilter(value)}>
-                    <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                    <SelectTrigger className="bg-gray-800/50 border-gray-700 text-white hover:border-yellow-500 transition-colors">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700">
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="indian">🇮🇳 Indian</SelectItem>
-                      <SelectItem value="bollywood">🎬 Bollywood</SelectItem>
-                      <SelectItem value="hindi">🗣️ Hindi</SelectItem>
+                    <SelectContent className="bg-gray-900 border-gray-700">
+                      <SelectItem value="all" className="hover:bg-yellow-500/20">🌍 All Regions</SelectItem>
+                      <SelectItem value="indian" className="hover:bg-yellow-500/20">🇮🇳 Indian</SelectItem>
+                      <SelectItem value="bollywood" className="hover:bg-yellow-500/20">🎬 Bollywood</SelectItem>
+                      <SelectItem value="hindi" className="hover:bg-yellow-500/20">🗣️ Hindi</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block text-gray-300">Sort By</label>
+                  <label className="text-sm font-bold mb-3 block text-white uppercase tracking-wider">Sort By</label>
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                    <SelectTrigger className="bg-gray-800/50 border-gray-700 text-white hover:border-yellow-500 transition-colors">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700">
-                      <SelectItem value="popularity.desc">Popular</SelectItem>
-                      <SelectItem value="vote_average.desc">Top Rated</SelectItem>
-                      <SelectItem value="release_date.desc">Newest</SelectItem>
-                      <SelectItem value="release_date.asc">Oldest</SelectItem>
+                    <SelectContent className="bg-gray-900 border-gray-700">
+                      <SelectItem value="popularity.desc" className="hover:bg-yellow-500/20">🔥 Most Popular</SelectItem>
+                      <SelectItem value="vote_average.desc" className="hover:bg-yellow-500/20">⭐ Top Rated</SelectItem>
+                      <SelectItem value="release_date.desc" className="hover:bg-yellow-500/20">🆕 Newest First</SelectItem>
+                      <SelectItem value="release_date.asc" className="hover:bg-yellow-500/20">📅 Oldest First</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -882,15 +1004,53 @@ export default function MovieRecommender() {
                 <div className="flex items-end sm:col-span-2 lg:col-span-1">
                   <Button
                     onClick={() => handleDiscover()}
-                    className="w-full bg-yellow-500 text-black hover:bg-yellow-600"
+                    className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-black hover:from-yellow-400 hover:to-orange-400 font-bold shadow-lg hover:shadow-yellow-500/50 transition-all duration-300 hover:scale-105"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Loading..." : "Apply"}
+                    {isLoading ? (
+                      <span className="flex items-center gap-2">
+                        <span className="animate-spin">⏳</span> Loading...
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <Filter className="h-4 w-4" /> Apply Filters
+                      </span>
+                    )}
                   </Button>
                 </div>
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Popular Movies Carousel */}
+        {activeTab === "popular" && movies.length > 0 && (
+          <div className="mb-10">
+            <PopularMoviesCarousel
+              movies={movies}
+              title="Most popular movies this week"
+              isInWatchlist={isInWatchlist}
+              onAddToWatchlist={addToWatchlist}
+              onRemoveFromWatchlist={removeFromWatchlist}
+              onMarkAsWatched={handleMarkAsWatched}
+              watchedMovies={watchedMovies}
+            />
+          </div>
+        )}
+
+        {/* Top Rated Movies Carousel */}
+        {activeTab === "top-rated" && movies.length > 0 && (
+          <div className="mb-10">
+            <PopularMoviesCarousel
+              movies={movies}
+              title="Top rated movies of all time"
+              isInWatchlist={isInWatchlist}
+              onAddToWatchlist={addToWatchlist}
+              onRemoveFromWatchlist={removeFromWatchlist}
+              onMarkAsWatched={handleMarkAsWatched}
+              watchedMovies={watchedMovies}
+            />
+          </div>
         )}
 
         {/* Movies Grid */}
@@ -903,23 +1063,44 @@ export default function MovieRecommender() {
           onLoadMovies={loadPopularMovies}
         />
 
-        {/* Load More Button */}
+        {/* Enhanced Load More Button */}
         {movies.length > 0 && hasMore && (
-          <div className="flex justify-center items-center gap-4 mt-8">
+          <div className="flex flex-col items-center gap-6 mt-12">
             <Button
               onClick={loadMoreMovies}
               disabled={isLoading}
-              className="bg-yellow-500 text-black hover:bg-yellow-600 px-8 py-6 text-lg font-semibold"
+              size="lg"
+              className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black hover:from-yellow-400 hover:to-orange-400 px-12 py-7 text-lg font-bold shadow-2xl hover:shadow-yellow-500/50 transition-all duration-300 hover:scale-110 group"
             >
-              {isLoading ? "Loading..." : "Load More Movies"}
+              {isLoading ? (
+                <span className="flex items-center gap-3">
+                  <span className="animate-spin text-2xl">⏳</span>
+                  <span>Loading More Movies...</span>
+                </span>
+              ) : (
+                <span className="flex items-center gap-3">
+                  <ChevronRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                  <span>Load More Movies</span>
+                  <ChevronRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                </span>
+              )}
             </Button>
+            <div className="text-center">
+              <p className="text-gray-400 text-sm">
+                Showing <span className="text-yellow-500 font-bold">{movies.length}</span> of{" "}
+                <span className="text-white font-bold">{totalPages * 20}</span> movies
+              </p>
+              <p className="text-gray-500 text-xs mt-1">Page {currentPage} of {totalPages}</p>
+            </div>
           </div>
         )}
 
-        {/* Show total count */}
-        {movies.length > 0 && (
-          <div className="text-center text-gray-400 mt-4">
-            Showing {movies.length} movies {totalPages > 1 && `(Page ${currentPage} of ${totalPages})`}
+        {/* Enhanced Movie Count */}
+        {movies.length > 0 && !hasMore && (
+          <div className="text-center mt-12 p-6 bg-gray-900/50 rounded-xl border border-gray-800">
+            <p className="text-gray-300 text-lg">
+              You've reached the end! Showing all <span className="text-yellow-500 font-bold">{movies.length}</span> movies
+            </p>
           </div>
         )}
 

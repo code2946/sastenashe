@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Play, Sparkles, Users, Heart, Zap, LogOut } from "lucide-react"
+import { Play, Sparkles, Heart, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AuthModal } from "@/components/auth-modal"
 import { supabase, type WatchlistItem } from "@/lib/supabase"
@@ -84,9 +83,11 @@ export default function SimpleLanding() {
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center">
-                  <span className="text-black font-bold text-xl">S</span>
-                </div>
+                <img
+                  src="/logo.png"
+                  alt="Screen On Fire"
+                  className="w-10 h-10 object-contain"
+                />
                 <span className="text-xl font-bold">ScreenOnFire</span>
               </div>
               
@@ -187,56 +188,6 @@ export default function SimpleLanding() {
               <div className="text-2xl font-bold text-yellow-500">24/7</div>
               <div className="text-gray-400 text-sm">Updated</div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="bg-gray-900 py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Why Choose <span className="text-yellow-500">ScreenOnFire</span>?
-            </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Experience movie discovery like never before with our advanced features
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="bg-gray-800 border-gray-700 text-center hover:border-yellow-500/50 transition-colors">
-              <CardContent className="p-6">
-                <Zap className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-                <h3 className="text-xl font-bold mb-2">AI Recommendations</h3>
-                <p className="text-gray-400">Get personalized movie suggestions powered by advanced AI that learns your taste and preferences.</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gray-800 border-gray-700 text-center hover:border-yellow-500/50 transition-colors">
-              <CardContent className="p-6">
-                <Heart className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-                <h3 className="text-xl font-bold mb-2">Smart Watchlists</h3>
-                <p className="text-gray-400">Create and manage intelligent watchlists that help you never miss a great movie again.</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gray-800 border-gray-700 text-center hover:border-yellow-500/50 transition-colors">
-              <CardContent className="p-6">
-                <Users className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-                <h3 className="text-xl font-bold mb-2">Community Discussions</h3>
-                <p className="text-gray-400">Join discussions with fellow movie enthusiasts and share your thoughts on the latest films.</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="text-center mt-12">
-            <Button 
-              size="lg"
-              onClick={() => router.push('/discover')}
-              className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold"
-            >
-              Start Exploring Movies
-            </Button>
           </div>
         </div>
       </section>

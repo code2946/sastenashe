@@ -3,8 +3,9 @@
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import {
   Search, X, RotateCcw, Grid3X3, Grid2X2, Star, Menu,
-  TrendingUp, Sparkles, Filter, Download, History,
-  Zap, Heart, Film, Clock, Award, Users, Palette, Calendar, ChevronDown, ChevronUp
+  Sparkles, Filter, Download, History,
+  Heart, Users, Palette, Calendar, ChevronDown, ChevronUp,
+  Film, Award, Clock
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -42,52 +43,6 @@ type Weights = {
   keywords: number;
   year: number;
 };
-
-// Preset mood configurations
-const MOOD_PRESETS = [
-  {
-    id: 'blockbuster',
-    name: 'Blockbuster Hits',
-    icon: <TrendingUp className="w-4 h-4" />,
-    weights: { genre: 80, rating: 90, director: 60, cast: 85, cinematography: 70, keywords: 65, year: 20 },
-    description: 'Popular, highly-rated crowd-pleasers'
-  },
-  {
-    id: 'hidden_gems',
-    name: 'Hidden Gems',
-    icon: <Sparkles className="w-4 h-4" />,
-    weights: { genre: 75, rating: 70, director: 80, cast: 40, cinematography: 85, keywords: 80, year: 50 },
-    description: 'Underrated masterpieces'
-  },
-  {
-    id: 'same_vibe',
-    name: 'Same Vibe',
-    icon: <Zap className="w-4 h-4" />,
-    weights: { genre: 95, rating: 50, director: 85, cast: 70, cinematography: 90, keywords: 95, year: 30 },
-    description: 'Very similar feel and tone'
-  },
-  {
-    id: 'classic',
-    name: 'Classics',
-    icon: <Award className="w-4 h-4" />,
-    weights: { genre: 60, rating: 95, director: 90, cast: 60, cinematography: 85, keywords: 70, year: 100 },
-    description: 'Timeless acclaimed films'
-  },
-  {
-    id: 'modern',
-    name: 'Modern Picks',
-    icon: <Clock className="w-4 h-4" />,
-    weights: { genre: 70, rating: 75, director: 65, cast: 80, cinematography: 85, keywords: 75, year: 5 },
-    description: 'Recent releases only'
-  },
-  {
-    id: 'director_driven',
-    name: 'Director\'s Cut',
-    icon: <Film className="w-4 h-4" />,
-    weights: { genre: 50, rating: 70, director: 100, cast: 40, cinematography: 90, keywords: 60, year: 40 },
-    description: 'Auteur-focused recommendations'
-  }
-];
 
 const DEFAULT_WEIGHTS: Weights = {
   genre: 75,
@@ -201,38 +156,6 @@ const EnhancedMovieCard: React.FC<{
       </div>
       </div>
     </Link>
-  );
-};
-
-// Mood Preset Selector
-const MoodPresetSelector: React.FC<{
-  onSelectPreset: (weights: Weights) => void;
-}> = ({ onSelectPreset }) => {
-  return (
-    <div className="space-y-3">
-      <h3 className="text-sm font-semibold text-gray-300 flex items-center gap-2">
-        <Sparkles className="w-4 h-4 text-yellow-400" />
-        Quick Presets
-      </h3>
-      <div className="grid grid-cols-2 gap-2">
-        {MOOD_PRESETS.map((preset) => (
-          <button
-            key={preset.id}
-            onClick={() => onSelectPreset(preset.weights)}
-            className="flex items-center gap-2 p-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-yellow-500/50 rounded-xl transition-all duration-200 group"
-            title={preset.description}
-          >
-            <div className="text-yellow-400 group-hover:scale-110 transition-transform">
-              {preset.icon}
-            </div>
-            <div className="text-left flex-1">
-              <p className="text-white text-sm font-medium">{preset.name}</p>
-              <p className="text-gray-400 text-xs line-clamp-1">{preset.description}</p>
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
   );
 };
 
@@ -508,9 +431,6 @@ const EnhancedRecommenderUI: React.FC = () => {
         )}
       </div>
 
-      {/* Mood Presets */}
-      <MoodPresetSelector onSelectPreset={(presetWeights) => setWeights(presetWeights)} />
-
       {/* Advanced Settings Toggle */}
       <button
         onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
@@ -623,9 +543,11 @@ const EnhancedRecommenderUI: React.FC = () => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push('/')}>
-                <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
-                  <span className="text-black font-bold text-lg">S</span>
-                </div>
+                <img
+                  src="/logo.png"
+                  alt="Screen On Fire"
+                  className="w-8 h-8 object-contain"
+                />
                 <span className="text-xl font-bold hidden sm:inline">ScreenOnFire</span>
               </div>
               <span className="text-gray-500">|</span>
@@ -696,10 +618,6 @@ const EnhancedRecommenderUI: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <Star className="w-4 h-4 text-yellow-400" />
                   <span>Personalized</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-yellow-400" />
-                  <span>Instant Results</span>
                 </div>
               </div>
             </div>

@@ -108,7 +108,7 @@ export default function MovieDetailsPage() {
   const [similarMovies, setSimilarMovies] = useState<TMDBMovie[]>([])
   const [watchProviders, setWatchProviders] = useState<WatchProviders>({})
   const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState("watch")
+  const [activeTab, setActiveTab] = useState("cast")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [authUser, setAuthUser] = useState<any | null>(null)
   const [isInWatchlist, setIsInWatchlist] = useState(false)
@@ -167,7 +167,15 @@ export default function MovieDetailsPage() {
       setCrew(creditsData.status === 'fulfilled' ? creditsData.value.crew : [])
       setVideos(videosData.status === 'fulfilled' ? videosData.value : [])
       setSimilarMovies(similarData.status === 'fulfilled' ? similarData.value.results : [])
-      setWatchProviders(providersData.status === 'fulfilled' ? providersData.value : {})
+
+      // Log providers data for debugging
+      if (providersData.status === 'fulfilled') {
+        console.log('Watch Providers Data:', providersData.value)
+        setWatchProviders(providersData.value)
+      } else {
+        console.log('Failed to load watch providers:', providersData.reason)
+        setWatchProviders({})
+      }
 
     } catch (error) {
       console.error("Error loading movie data:", error)
@@ -577,10 +585,11 @@ export default function MovieDetailsPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-4">
+              <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-4" suppressHydrationWarning>
                 <button
                   onClick={handleAiReview}
                   className="group relative px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 bg-gradient-to-r from-white to-gray-100 text-black font-bold text-sm sm:text-base lg:text-lg rounded-xl shadow-2xl hover:shadow-white/20 transform hover:scale-105 transition-all duration-300 border border-white/20"
+                  suppressHydrationWarning
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="relative flex items-center gap-2">
@@ -593,6 +602,7 @@ export default function MovieDetailsPage() {
                 <button
                   onClick={() => setIsDiscussionModalOpen(true)}
                   className="group relative px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold text-sm sm:text-base lg:text-lg rounded-xl shadow-2xl hover:shadow-blue-500/20 transform hover:scale-105 transition-all duration-300 border border-blue-400/20"
+                  suppressHydrationWarning
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="relative flex items-center gap-2">
@@ -613,6 +623,7 @@ export default function MovieDetailsPage() {
                       ? "bg-gradient-to-r from-yellow-400 to-yellow-500 text-black border-yellow-400/50 shadow-yellow-400/20"
                       : "bg-black/40 backdrop-blur-sm text-white border-white/30 hover:bg-black/60 hover:border-white/50"
                   }`}
+                  suppressHydrationWarning
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="relative flex items-center gap-2">
@@ -639,6 +650,7 @@ export default function MovieDetailsPage() {
                       ? "bg-gradient-to-r from-emerald-400 to-emerald-500 text-black border-emerald-400/50 shadow-emerald-400/20"
                       : "bg-black/40 backdrop-blur-sm text-white border-white/30 hover:bg-black/60 hover:border-white/50"
                   }`}
+                  suppressHydrationWarning
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="relative flex items-center gap-2">
@@ -655,6 +667,7 @@ export default function MovieDetailsPage() {
                         ? "bg-gradient-to-r from-emerald-400 to-emerald-500 text-black border-emerald-400/50 shadow-emerald-400/20"
                         : "bg-black/40 backdrop-blur-sm text-white border-white/30 hover:bg-black/60 hover:border-white/50"
                     }`}
+                    suppressHydrationWarning
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <ThumbsUp className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 relative z-10" />
@@ -667,6 +680,7 @@ export default function MovieDetailsPage() {
                         ? "bg-gradient-to-r from-red-400 to-red-500 text-black border-red-400/50 shadow-red-400/20"
                         : "bg-black/40 backdrop-blur-sm text-white border-white/30 hover:bg-black/60 hover:border-white/50"
                     }`}
+                    suppressHydrationWarning
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <ThumbsDown className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 relative z-10" />
@@ -681,52 +695,63 @@ export default function MovieDetailsPage() {
       {/* Content Tabs */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-gray-900 border-gray-800 gap-1 p-1">
-            <TabsTrigger value="watch" className="data-[state=active]:bg-yellow-500 data-[state=active]:text-black text-xs sm:text-sm">
-              <span className="hidden sm:inline">Where to Watch</span>
-              <span className="sm:hidden">Watch</span>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 bg-gray-900 border-gray-800 gap-1 p-1">
+            <TabsTrigger value="cast" className="data-[state=active]:bg-yellow-500 data-[state=active]:text-black text-xs sm:text-sm">
+              Cast
             </TabsTrigger>
             <TabsTrigger value="synopsis" className="data-[state=active]:bg-yellow-500 data-[state=active]:text-black text-xs sm:text-sm">
               Synopsis
+            </TabsTrigger>
+            <TabsTrigger value="watch" className="data-[state=active]:bg-yellow-500 data-[state=active]:text-black text-xs sm:text-sm">
+              <span className="hidden sm:inline" suppressHydrationWarning>Where to Watch</span>
+              <span className="sm:hidden" suppressHydrationWarning>Watch</span>
             </TabsTrigger>
             <TabsTrigger value="trailers" className="data-[state=active]:bg-yellow-500 data-[state=active]:text-black text-xs sm:text-sm">
               Trailers
             </TabsTrigger>
             <TabsTrigger value="similar" className="data-[state=active]:bg-yellow-500 data-[state=active]:text-black text-xs sm:text-sm">
-              <span className="hidden sm:inline">Similar Titles</span>
-              <span className="sm:hidden">Similar</span>
+              <span className="hidden sm:inline" suppressHydrationWarning>Similar Titles</span>
+              <span className="sm:hidden" suppressHydrationWarning>Similar</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Where to Watch */}
           <TabsContent value="watch" className="mt-8">
-            <div className="space-y-6">
+            <div className="space-y-8">
+              <div className="bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 rounded-xl p-4">
+                <p className="text-gray-300 text-sm">
+                  Click on a provider to search for "{movie.title}" on their platform
+                </p>
+              </div>
+
               {watchProviders.flatrate && watchProviders.flatrate.length > 0 && (
                 <div>
-                  <h3 className="text-xl font-semibold mb-4">Stream</h3>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <h3 className="text-2xl font-semibold mb-4 text-yellow-500 flex items-center gap-2">
+                    <Play className="w-6 h-6" />
+                    Stream
+                  </h3>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {watchProviders.flatrate.map((provider) => (
-                      <Card key={provider.provider_id} className="bg-gray-900 border-gray-800">
-                        <CardContent className="p-4 flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <img
-                              src={getImageUrl(provider.logo_path, "w200") || "/placeholder.svg"}
-                              alt={provider.provider_name}
-                              className="w-12 h-12 rounded-lg"
-                            />
-                            <div>
-                              <p className="font-semibold text-white">{provider.provider_name}</p>
-                              <p className="text-sm text-gray-400">Subscription</p>
+                      <Card
+                        key={provider.provider_id}
+                        className="bg-gray-900 border-gray-800 hover:border-yellow-500 transition-all duration-300 group cursor-pointer overflow-hidden"
+                        onClick={() => window.open(getProviderURL(provider.provider_id, movie.title), '_blank')}
+                      >
+                        <CardContent className="p-5 flex items-center justify-between">
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-gray-800 group-hover:ring-2 group-hover:ring-yellow-500 transition-all">
+                              <img
+                                src={getImageUrl(provider.logo_path, "w200") || "https://via.placeholder.com/100/1f2937/9ca3af?text=?"}
+                                alt={provider.provider_name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-white group-hover:text-yellow-500 transition-colors">{provider.provider_name}</p>
+                              <p className="text-sm text-gray-400">Subscription Required</p>
                             </div>
                           </div>
-                          <Button 
-                            size="sm" 
-                            className="bg-yellow-500 text-black hover:bg-yellow-600"
-                            onClick={() => window.open(getProviderURL(provider.provider_id, movie.title), '_blank')}
-                          >
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            Stream
-                          </Button>
+                          <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-yellow-500 transition-colors flex-shrink-0 ml-2" />
                         </CardContent>
                       </Card>
                     ))}
@@ -736,31 +761,67 @@ export default function MovieDetailsPage() {
 
               {watchProviders.rent && watchProviders.rent.length > 0 && (
                 <div>
-                  <h3 className="text-xl font-semibold mb-4">Rent</h3>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <h3 className="text-2xl font-semibold mb-4 text-yellow-500 flex items-center gap-2">
+                    <Clock className="w-6 h-6" />
+                    Rent or Buy
+                  </h3>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {watchProviders.rent.map((provider) => (
-                      <Card key={provider.provider_id} className="bg-gray-900 border-gray-800">
-                        <CardContent className="p-4 flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <img
-                              src={getImageUrl(provider.logo_path, "w200") || "/placeholder.svg"}
-                              alt={provider.provider_name}
-                              className="w-12 h-12 rounded-lg"
-                            />
-                            <div>
-                              <p className="font-semibold text-white">{provider.provider_name}</p>
-                              <p className="text-sm text-gray-400">From $3.99</p>
+                      <Card
+                        key={provider.provider_id}
+                        className="bg-gray-900 border-gray-800 hover:border-yellow-500 transition-all duration-300 group cursor-pointer overflow-hidden"
+                        onClick={() => window.open(getProviderURL(provider.provider_id, movie.title), '_blank')}
+                      >
+                        <CardContent className="p-5 flex items-center justify-between">
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-gray-800 group-hover:ring-2 group-hover:ring-yellow-500 transition-all">
+                              <img
+                                src={getImageUrl(provider.logo_path, "w200") || "https://via.placeholder.com/100/1f2937/9ca3af?text=?"}
+                                alt={provider.provider_name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-white group-hover:text-yellow-500 transition-colors">{provider.provider_name}</p>
+                              <p className="text-sm text-gray-400">Rental Available</p>
                             </div>
                           </div>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="border-gray-600 text-white hover:bg-gray-800 bg-transparent"
-                            onClick={() => window.open(getProviderURL(provider.provider_id, movie.title), '_blank')}
-                          >
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            Rent
-                          </Button>
+                          <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-yellow-500 transition-colors flex-shrink-0 ml-2" />
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {watchProviders.buy && watchProviders.buy.length > 0 && (
+                <div>
+                  <h3 className="text-2xl font-semibold mb-4 text-yellow-500 flex items-center gap-2">
+                    <ExternalLink className="w-6 h-6" />
+                    Buy
+                  </h3>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {watchProviders.buy.map((provider) => (
+                      <Card
+                        key={provider.provider_id}
+                        className="bg-gray-900 border-gray-800 hover:border-yellow-500 transition-all duration-300 group cursor-pointer overflow-hidden"
+                        onClick={() => window.open(getProviderURL(provider.provider_id, movie.title), '_blank')}
+                      >
+                        <CardContent className="p-5 flex items-center justify-between">
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-gray-800 group-hover:ring-2 group-hover:ring-yellow-500 transition-all">
+                              <img
+                                src={getImageUrl(provider.logo_path, "w200") || "https://via.placeholder.com/100/1f2937/9ca3af?text=?"}
+                                alt={provider.provider_name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-white group-hover:text-yellow-500 transition-colors">{provider.provider_name}</p>
+                              <p className="text-sm text-gray-400">Purchase Available</p>
+                            </div>
+                          </div>
+                          <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-yellow-500 transition-colors flex-shrink-0 ml-2" />
                         </CardContent>
                       </Card>
                     ))}
@@ -769,9 +830,21 @@ export default function MovieDetailsPage() {
               )}
 
               {(!watchProviders.flatrate || watchProviders.flatrate.length === 0) &&
-                (!watchProviders.rent || watchProviders.rent.length === 0) && (
-                  <div className="text-center py-12">
-                    <p className="text-gray-400 text-lg">No streaming options available in your region</p>
+                (!watchProviders.rent || watchProviders.rent.length === 0) &&
+                (!watchProviders.buy || watchProviders.buy.length === 0) && (
+                  <div className="text-center py-16 bg-gray-900/50 border border-gray-800 rounded-xl">
+                    <ExternalLink className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-400 mb-2">No Streaming Options Found</h3>
+                    <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                      We couldn't find any streaming services for this movie in your region. Try searching on popular platforms directly.
+                    </p>
+                    <Button
+                      className="bg-yellow-500 text-black hover:bg-yellow-600"
+                      onClick={() => window.open(`https://www.google.com/search?q=watch+${encodeURIComponent(movie.title)}+online`, '_blank')}
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Search on Google
+                    </Button>
                   </div>
                 )}
             </div>
@@ -781,91 +854,139 @@ export default function MovieDetailsPage() {
           <TabsContent value="synopsis" className="mt-8">
             <div className="space-y-8">
               <div>
-                <h3 className="text-xl font-semibold mb-4">Overview</h3>
+                <h3 className="text-2xl font-semibold mb-4 text-yellow-500">Overview</h3>
                 <p className="text-gray-300 leading-relaxed text-lg">{movie.overview}</p>
               </div>
 
-              <div>
-                <h3 className="text-xl font-semibold mb-4">Director</h3>
-                <p className="text-gray-300 text-lg">{getDirector()}</p>
+              <div className="grid sm:grid-cols-2 gap-6">
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold mb-3 text-yellow-500">Director</h3>
+                  <p className="text-gray-300 text-lg">{getDirector()}</p>
+                </div>
+
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold mb-3 text-yellow-500">Release Date</h3>
+                  <p className="text-gray-300 text-lg">{movie.release_date}</p>
+                </div>
+
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold mb-3 text-yellow-500">Runtime</h3>
+                  <p className="text-gray-300 text-lg">{formatRuntime(movie.runtime)}</p>
+                </div>
+
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold mb-3 text-yellow-500">Rating</h3>
+                  <p className="text-gray-300 text-lg">{movie.vote_average.toFixed(1)}/10</p>
+                </div>
               </div>
 
-              <div>
-                <h3 className="text-xl font-semibold mb-4">Cast</h3>
-                <ScrollArea className="w-full">
-                  <div className="flex gap-4 pb-4">
-                    {cast.map((actor) => (
-                      <Card key={actor.id} className="bg-gray-900 border-gray-800 flex-shrink-0 w-32">
-                        <CardContent className="p-3">
-                          <div className="aspect-[3/4] mb-3 overflow-hidden rounded-lg">
-                            <img
-                              src={
-                                getImageUrl(actor.profile_path, "w300") ||
-                                "/placeholder.svg?height=160&width=120&text=No+Image" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg"
-                              }
-                              alt={actor.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <h4 className="font-semibold text-sm text-white mb-1 line-clamp-2">{actor.name}</h4>
-                          <p className="text-xs text-gray-400 line-clamp-2">{actor.character}</p>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
+              {movie.tagline && (
+                <div className="bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 rounded-xl p-6">
+                  <p className="text-gray-300 italic text-lg">"{movie.tagline}"</p>
+                </div>
+              )}
             </div>
           </TabsContent>
 
-          {/* Trailers */}
-          <TabsContent value="trailers" className="mt-8">
+          {/* Cast */}
+          <TabsContent value="cast" className="mt-8">
             <div className="space-y-6">
-              {videos.length > 0 ? (
-                <div className="grid md:grid-cols-2 gap-6">
-                  {videos.slice(0, 4).map((video) => (
-                    <Card key={video.id} className="bg-gray-900 border-gray-800 overflow-hidden">
-                      <div className="aspect-video relative group cursor-pointer">
+              <div className="flex items-center justify-between">
+                <h3 className="text-2xl font-semibold text-yellow-500">Cast & Crew</h3>
+                <p className="text-gray-400 text-sm">{cast.length} cast members</p>
+              </div>
+
+              {cast.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                  {cast.map((actor) => (
+                    <Card key={actor.id} className="bg-gray-900 border-gray-800 hover:border-yellow-500 transition-all duration-300 group overflow-hidden">
+                      <div className="aspect-[2/3] overflow-hidden">
                         <img
-                          src={`https://img.youtube.com/vi/${video.key}/maxresdefault.jpg`}
-                          alt={video.name}
-                          className="w-full h-full object-cover"
+                          src={
+                            getImageUrl(actor.profile_path, "w300") ||
+                            "https://via.placeholder.com/300x450/1f2937/9ca3af?text=No+Image"
+                          }
+                          alt={actor.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
-                          <Button
-                            size="lg"
-                            className="bg-red-600 hover:bg-red-700 text-white rounded-full"
-                            onClick={() => window.open(`https://www.youtube.com/watch?v=${video.key}`, "_blank")}
-                          >
-                            <Play className="h-6 w-6" />
-                          </Button>
-                        </div>
                       </div>
                       <CardContent className="p-4">
-                        <h4 className="font-semibold text-white line-clamp-2">{video.name}</h4>
+                        <h4 className="font-semibold text-sm text-white mb-1 line-clamp-2 group-hover:text-yellow-500 transition-colors">{actor.name}</h4>
+                        <p className="text-xs text-gray-400 line-clamp-2">{actor.character}</p>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <p className="text-gray-400 text-lg">No trailers available</p>
+                  <p className="text-gray-400 text-lg">No cast information available</p>
+                </div>
+              )}
+
+              {crew.filter(c => c.job === "Director" || c.job === "Producer" || c.job === "Writer").length > 0 && (
+                <div className="mt-8">
+                  <h3 className="text-xl font-semibold mb-4 text-yellow-500">Key Crew</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {crew
+                      .filter(c => c.job === "Director" || c.job === "Producer" || c.job === "Writer")
+                      .slice(0, 6)
+                      .map((crewMember) => (
+                        <div key={crewMember.id} className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 hover:border-yellow-500/50 transition-colors">
+                          <p className="font-semibold text-white">{crewMember.name}</p>
+                          <p className="text-sm text-gray-400">{crewMember.job}</p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          {/* Trailers */}
+          <TabsContent value="trailers" className="mt-8">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-2xl font-semibold text-yellow-500">Videos & Trailers</h3>
+                <p className="text-gray-400 text-sm">{videos.length} videos available</p>
+              </div>
+
+              {videos.length > 0 ? (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                  {videos.slice(0, 6).map((video) => (
+                    <Card key={video.id} className="bg-gray-900 border-gray-800 hover:border-yellow-500 transition-all duration-300 group overflow-hidden">
+                      <div className="aspect-video relative group cursor-pointer overflow-hidden">
+                        <img
+                          src={`https://img.youtube.com/vi/${video.key}/maxresdefault.jpg`}
+                          alt={video.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-all duration-300">
+                          <div className="transform group-hover:scale-110 transition-transform duration-300">
+                            <Button
+                              size="lg"
+                              className="bg-red-600 hover:bg-red-700 text-white rounded-full w-16 h-16 shadow-2xl"
+                              onClick={() => window.open(`https://www.youtube.com/watch?v=${video.key}`, "_blank")}
+                            >
+                              <Play className="h-8 w-8 fill-white" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
+                          {video.type}
+                        </div>
+                      </div>
+                      <CardContent className="p-4 bg-gray-900">
+                        <h4 className="font-semibold text-white line-clamp-2 group-hover:text-yellow-500 transition-colors">{video.name}</h4>
+                        <p className="text-xs text-gray-400 mt-1">YouTube • {video.site}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16 bg-gray-900/50 border border-gray-800 rounded-xl">
+                  <Play className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-400 mb-2">No Trailers Available</h3>
+                  <p className="text-gray-500">No videos or trailers are available for this movie yet.</p>
                 </div>
               )}
             </div>

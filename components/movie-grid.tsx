@@ -2,6 +2,7 @@
 
 import { memo } from "react"
 import { Film } from "lucide-react"
+import { motion } from "framer-motion"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import MovieCard from "@/components/movie-card"
@@ -26,13 +27,16 @@ const MovieGrid = memo(function MovieGrid({
 }: MovieGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-10">
         {[...Array(12)].map((_, i) => (
-          <Card key={i} className="bg-gray-900 border-gray-800 animate-pulse">
-            <div className="aspect-[2/3] bg-gray-700 rounded-t-lg" />
-            <CardContent className="p-3">
-              <div className="h-4 bg-gray-700 rounded mb-2" />
-              <div className="h-3 bg-gray-700 rounded" />
+          <Card key={i} className="bg-gradient-to-b from-gray-900 to-black border-2 border-gray-800 animate-pulse overflow-hidden shadow-xl">
+            <div className="aspect-[2/3] bg-gradient-to-b from-gray-700 to-gray-800 rounded-t-xl" />
+            <CardContent className="p-4">
+              <div className="h-5 bg-gray-700 rounded-lg mb-3" />
+              <div className="flex items-center justify-between">
+                <div className="h-4 w-16 bg-gray-700 rounded" />
+                <div className="h-4 w-12 bg-gray-700 rounded" />
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -57,18 +61,63 @@ const MovieGrid = memo(function MovieGrid({
     )
   }
 
+  // Animation variants for staggered children
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+        delayChildren: 0.1
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: {
+      opacity: 0,
+      scale: 0.8,
+      y: 20
+    },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: [0.25, 0.46, 0.45, 0.94] // Custom easing curve
+      }
+    }
+  }
+
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6 mb-8">
-      {movies.map((movie) => (
-        <MovieCard
+    <motion.div
+      className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-10 mb-8"
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-100px" }}
+    >
+      {movies.map((movie, index) => (
+        <motion.div
           key={movie.id}
-          movie={movie}
-          isInWatchlist={isInWatchlist(movie.id.toString())}
-          onAddToWatchlist={onAddToWatchlist}
-          onRemoveFromWatchlist={onRemoveFromWatchlist}
-        />
+          variants={itemVariants}
+          whileHover={{
+            scale: 1.05,
+            y: -10,
+            transition: { duration: 0.3, ease: "easeOut" }
+          }}
+          className="relative"
+        >
+          <MovieCard
+            movie={movie}
+            isInWatchlist={isInWatchlist(movie.id.toString())}
+            onAddToWatchlist={onAddToWatchlist}
+            onRemoveFromWatchlist={onRemoveFromWatchlist}
+          />
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   )
 })
 

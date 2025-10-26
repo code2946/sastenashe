@@ -164,3 +164,98 @@ body {
     font-size: 16px !important;
   }
 }
+
+/* Cinematic Motion Blur Effect */
+@keyframes motionBlur {
+  0% {
+    filter: blur(0px);
+    opacity: 0;
+  }
+  50% {
+    filter: blur(2px);
+    opacity: 0.5;
+  }
+  100% {
+    filter: blur(0px);
+    opacity: 1;
+  }
+}
+
+.cinematic-blur-in {
+  animation: motionBlur 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Smooth gradient transitions */
+.gradient-transition {
+  transition: background 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Enhanced card hover with glow */
+.card-glow {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card-glow:hover {
+  box-shadow: 0 0 20px rgba(234, 179, 8, 0.3),
+              0 0 40px rgba(234, 179, 8, 0.2),
+              0 10px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* Parallax smooth transform */
+.parallax-smooth {
+  will-change: transform;
+  transition: transform 0.1s ease-out;
+}
+
+/* Cinematic fade with blur */
+@keyframes cinematicFade {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: scale(1.05);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+  }
+}
+
+.cinematic-fade {
+  animation: cinematicFade 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Smooth scale animation */
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.scale-in {
+  animation: scaleIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Performance optimizations for smooth animations */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  * {
+    scroll-behavior: smooth;
+  }
+}
+
+/* GPU acceleration for better performance */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}

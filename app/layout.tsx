@@ -9,11 +9,15 @@ import ServiceWorkerInitializer from "@/components/service-worker-initializer"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "ScreenOnFire",
-  description: "Your ultimate movie recommender.",
+  title: "ScreenOnFire - Cinematic Discovery",
+  description: "Your ultimate movie recommender powered by AI.",
   generator: 'v0.dev',
   themeColor: '#EAB308',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
 }
 
 export const viewport: Viewport = {
@@ -29,8 +33,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={inter.className}>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
         <ServiceWorkerInitializer />
         <PerformanceMonitor />
         {children}

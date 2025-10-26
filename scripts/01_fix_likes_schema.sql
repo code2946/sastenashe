@@ -19,6 +19,11 @@ CREATE TABLE IF NOT EXISTS public.movie_dislikes (
     CONSTRAINT unique_user_movie_dislike UNIQUE(user_id, movie_id)
 );
 
+
+
+
+
+
 -- Enable Row Level Security (RLS)
 ALTER TABLE public.movie_dislikes ENABLE ROW LEVEL SECURITY;
 
