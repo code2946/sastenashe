@@ -59,29 +59,41 @@ export class PerformanceMonitor {
   // Get Web Vitals if available
   getWebVitals(): void {
     if (typeof window === 'undefined') return
-    
-    // CLS - Cumulative Layout Shift
-    new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        if (entry.entryType === 'layout-shift' && !(entry as any).hadRecentInput) {
-          console.log(`📊 CLS: ${entry.value}`)
+
+    try {
+      // CLS - Cumulative Layout Shift
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (entry.entryType === 'layout-shift' && !(entry as any).hadRecentInput) {
+            console.log(`📊 CLS: ${(entry as any).value}`)
+          }
         }
-      }
-    }).observe({ entryTypes: ['layout-shift'] })
-    
-    // LCP - Largest Contentful Paint  
-    new PerformanceObserver((list) => {
-      const entries = list.getEntries()
-      const lastEntry = entries[entries.length - 1]
-      console.log(`📊 LCP: ${lastEntry.startTime}ms`)
-    }).observe({ entryTypes: ['largest-contentful-paint'] })
-    
-    // FID - First Input Delay
-    new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        console.log(`📊 FID: ${entry.processingStart - entry.startTime}ms`)
-      }
-    }).observe({ entryTypes: ['first-input'] })
+      }).observe({ entryTypes: ['layout-shift'] })
+    } catch (e) {
+      // Browser may not support this metric
+    }
+
+    try {
+      // LCP - Largest Contentful Paint
+      new PerformanceObserver((list) => {
+        const entries = list.getEntries()
+        const lastEntry = entries[entries.length - 1]
+        console.log(`📊 LCP: ${lastEntry.startTime}ms`)
+      }).observe({ entryTypes: ['largest-contentful-paint'] })
+    } catch (e) {
+      // Browser may not support this metric
+    }
+
+    try {
+      // FID - First Input Delay
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          console.log(`📊 FID: ${(entry as any).processingStart - entry.startTime}ms`)
+        }
+      }).observe({ entryTypes: ['first-input'] })
+    } catch (e) {
+      // Browser may not support this metric
+    }
   }
   
   // Memory usage monitoring
