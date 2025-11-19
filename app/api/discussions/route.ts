@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
 
+// Force dynamic rendering (prevents build-time execution)
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 // GET /api/discussions - Get discussions for a movie
 export async function GET(request: NextRequest) {
   try {

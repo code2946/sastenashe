@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Output configuration for serverless deployment
+  output: 'standalone',
+
   eslint: {
     ignoreDuringBuilds: true,
   },

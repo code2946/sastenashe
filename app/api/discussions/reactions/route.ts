@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
 
+// Force dynamic rendering (prevents build-time execution)
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 // POST /api/discussions/reactions - Add or update a reaction
 export async function POST(request: NextRequest) {
   try {

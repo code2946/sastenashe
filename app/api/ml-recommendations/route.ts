@@ -1,8 +1,8 @@
 import { NextRequest } from 'next/server'
-import { 
-  generateRecommendations, 
+import {
+  generateRecommendations,
   RecommendationRequest,
-  RecommendationWeights 
+  RecommendationWeights
 } from '@/lib/ml-recommender'
 import { TMDBMovie } from '@/lib/tmdb-supabase'
 import {
@@ -12,6 +12,9 @@ import {
   getSimilarMoviesServer
 } from '@/lib/tmdb-server'
 
+// Force dynamic rendering (prevents build-time execution)
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 export const maxDuration = 60 // Extended timeout for ML processing
 
 interface MLRecommendationRequestBody {
