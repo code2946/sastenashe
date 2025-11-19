@@ -5,7 +5,7 @@ export const runtime = 'edge';
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org';
 
 async function retryFetch(url: string, options: RequestInit, maxRetries = 3): Promise<Response> {
-  let lastError: Error;
+  let lastError: Error = new Error('Unknown error');
   
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {

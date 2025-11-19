@@ -16,11 +16,14 @@ export interface TMDBMovie {
   popularity?: number
   original_language?: string
   category?: string
+  vote_count?: number
+  adult?: boolean
 }
 
 export interface TMDBMovieDetails extends TMDBMovie {
   runtime: number
   genres: { id: number; name: string }[]
+  tagline?: string
   credits?: {
     cast: { name: string; character: string }[]
     crew: { name: string; job: string }[]
@@ -319,16 +322,16 @@ export const getMoviesByGenre = async (
 // Generate image URLs using the proxy
 export const getImageUrl = (
   path: string | null,
-  size: "w200" | "w300" | "w342" | "w500" | "w780" | "original" = "w500",
+  size: "w92" | "w154" | "w185" | "w200" | "w300" | "w342" | "w500" | "w780" | "w1280" | "original" = "w500",
 ): string => {
   if (!path) {
     return '/placeholder.jpg'
   }
-  
+
   // For development and faster loading, try direct TMDB first with fallback
   // This bypasses our proxy which might be slow
   const directTMDBUrl = `https://image.tmdb.org/t/p/${size}${path}`
-  
+
   // Return direct URL for better performance
   // Our proxy can be used as backup if direct access fails
   return directTMDBUrl

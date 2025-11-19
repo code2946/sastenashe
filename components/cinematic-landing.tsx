@@ -218,7 +218,7 @@ export default function CinematicLanding() {
       setTotalPages(data.total_pages)
       setCurrentPage(page)
       setHasMore(page < data.total_pages)
-      setActiveTab("bollywood")
+      setActiveTab("indian")
       if (page === 1 && !append) setFeaturedMovie(data.results[0])
     } catch (error) {
       console.error("Error loading Bollywood movies:", error)
@@ -235,7 +235,7 @@ export default function CinematicLanding() {
       setTotalPages(data.total_pages)
       setCurrentPage(page)
       setHasMore(page < data.total_pages)
-      setActiveTab("hindi")
+      setActiveTab("indian")
       if (page === 1 && !append) setFeaturedMovie(data.results[0])
     } catch (error) {
       console.error("Error loading Hindi movies:", error)

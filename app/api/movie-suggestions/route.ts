@@ -48,7 +48,6 @@ Format your response as a numbered list with movie title, year, and a brief reas
         },
         { role: "user", content: prompt },
       ],
-      maxTokens: 500,
       temperature: 0.8,
     })
 

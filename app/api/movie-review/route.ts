@@ -81,7 +81,8 @@ export async function POST(req: Request) {
 
               controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ done: true })}\n\n`))
             } catch (error) {
-              controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ error: error.message })}\n\n`))
+              const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+              controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ error: errorMessage })}\n\n`))
             } finally {
               controller.close()
             }

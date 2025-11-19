@@ -92,8 +92,8 @@ export default function MovieRecommender() {
 
     // INSTANT LOADING STRATEGY:
     // 1. Preload EVERYTHING immediately for instant switching
-    const allUrls = []
-    
+    const allUrls: string[] = []
+
     movies.forEach(movie => {
       // Multiple sizes for different use cases
       if (movie.poster_path) {
@@ -115,7 +115,7 @@ export default function MovieRecommender() {
     const uniqueUrls = [...new Set(allUrls)].filter(Boolean) as string[]
 
     // IMMEDIATE preload for next/prev (highest priority)
-    const immediateUrls = []
+    const immediateUrls: string[] = []
     for (let i = -1; i <= 1; i++) {
       const index = (currentIndex + i + movies.length) % movies.length
       const movie = movies[index]

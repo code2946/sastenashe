@@ -58,14 +58,14 @@ export async function extractMovieFeatures(movie: TMDBMovie): Promise<MovieFeatu
     const year = new Date(movie.release_date || '2000-01-01').getFullYear()
     
     // Extract genres
-    const genres = details.genres?.map(g => g.id) || movie.genre_ids || []
-    const genreNames = details.genres?.map(g => g.name) || []
-    
+    const genres = details.genres?.map((g: { id: number; name: string }) => g.id) || movie.genre_ids || []
+    const genreNames = details.genres?.map((g: { id: number; name: string }) => g.name) || []
+
     // Extract cast and crew
-    const cast = details.credits?.cast?.slice(0, 10).map(c => c.name.toLowerCase()) || []
+    const cast = details.credits?.cast?.slice(0, 10).map((c: { name: string; character: string }) => c.name.toLowerCase()) || []
     const director = details.credits?.crew
-      ?.filter(c => c.job === 'Director')
-      .map(c => c.name.toLowerCase()) || []
+      ?.filter((c: { name: string; job: string }) => c.job === 'Director')
+      .map((c: { name: string; job: string }) => c.name.toLowerCase()) || []
     
     // Generate keywords from title and overview
     const keywords = generateKeywords(movie.title, movie.overview)
