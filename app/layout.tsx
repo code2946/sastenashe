@@ -12,7 +12,6 @@ export const metadata: Metadata = {
   title: "ScreenOnFire - Cinematic Discovery",
   description: "Your ultimate movie recommender powered by AI.",
   generator: 'v0.dev',
-  themeColor: '#EAB308',
   manifest: '/manifest.json',
   icons: {
     icon: '/logo.png',
@@ -25,6 +24,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
+  themeColor: '#EAB308',
 }
 
 export default function RootLayout({
